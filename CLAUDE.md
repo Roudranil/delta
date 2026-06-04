@@ -131,6 +131,8 @@ All architecture decisions are written before code. Read these before touching t
 | `docs/01-planning/v1-sds/10-memory-caching.md` | Semantic cache, LangMem, contradiction detection |
 | `docs/01-planning/v1-sds/11-api-spec.md` | Every endpoint, request/response shapes, SSE events |
 | `docs/01-planning/v1-sds/12-error-handling.md` | ToolResult, logging, retry policy, SSE error events |
+| `docs/01-planning/v1-sds/13-local-dev.md` | Docker Compose stack, env files, auth bypass, Redis abstraction |
+| `docs/01-planning/v1-sds/14-frontend.md` | React + TS stack, library choices, folder structure, Vite proxy setup |
 
 ---
 
