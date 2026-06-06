@@ -61,6 +61,10 @@ web/src/
 - `db/` is the only place storage clients are imported
 - Nodes write messages to Postgres directly as they run (not buffered)
 
+### Python
+
+Python packages and dependencies are listed in `./server/pyproject.toml` and not global level `pyproject.toml`.
+
 ---
 
 ## Models
@@ -143,3 +147,5 @@ All architecture decisions are written before code. Read these before touching t
 - No abstractions until there's a concrete reason.
 - If a feature doesn't make research easier, defer it.
 - Do not add V2 features (FalkorDB graph, Blaxel batch jobs, knowledge graph visualisation) until V1 is in production.
+- Do not read `.env.dev`, `.env.prod`. Read `.env.local` only if you want to know the keys for the variables.
+- Always surface unknown unknowns and caveats to the user proactively. Let them proactively know of alternatives, consider different use cases, consider proactive looking at documentation to suggest recommendations with foresight
