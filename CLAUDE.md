@@ -9,7 +9,7 @@ Delta is a personal research agent for literature survey, paper discovery, and s
 Two modes, both in the same session-based interface:
 
 - **EXPLORE** — conversational ReAct loop. Full tool access. Responds in seconds. Inline markdown with citations.
-- **DEEP** — structured pipeline: clarify → plan → fan-out researchers → synthesize. 10–20 min. Produces a stored MDX artifact (literature review).
+- **DEEP** — structured pipeline: clarify -> plan -> fan-out researchers -> synthesize. 10–20 min. Produces a stored MDX artifact (literature review).
 
 A session has a fixed mode. After a DEEP run completes, follow-up questions run as EXPLORE automatically.
 
@@ -41,7 +41,7 @@ server/app/
   graphs/       # LangGraph graph definitions + nodes/
   tools/        # What the graph calls — orchestrates sources, caching, fallbacks
   sources/      # Thin API clients (S2, OpenAlex, arXiv, Exa, Tavily)
-  extract/      # PDF/HTML → clean text → chunks → embeddings
+  extract/      # PDF/HTML -> clean text -> chunks -> embeddings
   db/           # All Postgres/Redis/R2 clients live here (migrations/ inside)
   models/       # Pydantic: domain models, API contracts, LLM output schemas
   lib/          # llm.py (single LLM entry), cache.py, memory.py, logging setup
@@ -103,8 +103,8 @@ R2 layout: `{user_id}/papers/{paper_id}/full.pdf`, `artifacts/{session_id}/{run_
 REST + SSE, all under `/api/v1`. Auth: `Authorization: Bearer <clerk_jwt>`.
 
 Key patterns:
-- **EXPLORE**: `POST /sessions/{id}/chat` → `text/event-stream`. Events: `token`, `tool_call`, `tool_result`, `message_saved`, `done`, `error`, `budget_exceeded`, `timeout`.
-- **DEEP**: `POST /sessions/{id}/runs` (starts background task, returns `run_id`) → poll `GET /sessions/{id}/runs/{run_id}` every 5s → if `status=interrupted`, submit answers via `POST /runs/{id}/resume`.
+- **EXPLORE**: `POST /sessions/{id}/chat` -> `text/event-stream`. Events: `token`, `tool_call`, `tool_result`, `message_saved`, `done`, `error`, `budget_exceeded`, `timeout`.
+- **DEEP**: `POST /sessions/{id}/runs` (starts background task, returns `run_id`) -> poll `GET /sessions/{id}/runs/{run_id}` every 5s -> if `status=interrupted`, submit answers via `POST /runs/{id}/resume`.
 - **Branching**: `POST /sessions/{id}/branch` creates a new session with messages reconstructed up to the branch point.
 
 Full spec: `docs/01-planning/v1-sds/11-api-spec.md`
@@ -128,7 +128,7 @@ All architecture decisions are written before code. Read these before touching t
 |-----|---------------|
 | `docs/01-planning/v1-sds/01-hosting-infra.md` | Render, Neon, R2, Upstash, Cloudflare Pages, Clerk |
 | `docs/01-planning/v1-sds/02-paper-apis.md` | S2, OpenAlex, arXiv — paper fetch waterfall |
-| `docs/01-planning/v1-sds/04-web-search.md` | Exa → Tavily fallback |
+| `docs/01-planning/v1-sds/04-web-search.md` | Exa -> Tavily fallback |
 | `docs/01-planning/v1-sds/07-data-model.md` | Full Postgres schema, R2 structure, Redis keys |
 | `docs/01-planning/v1-sds/08-agent-graph.md` | EXPLORE + DEEP graph design, state shapes, SSE contract |
 | `docs/01-planning/v1-sds/09-llm-model-config.md` | Model tiers, `get_model()`, cost estimates |
