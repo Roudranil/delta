@@ -13,7 +13,15 @@ class AppSettings(BaseAppSettings):
     """Global app settings. These are generic app level settings"""
 
     app_env: Literal["dev", "local", "prod"] = "dev"
-    log_level: Literal["TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "info"
+
+    # logging related
+    log_level: Literal["TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
+    log_json_enabled: bool = True
+    log_json_path: str = "logs/app.jsonl"
+    log_rotation: str = "100 MB"
+    log_retention: str = "30 days"
+    log_compression: str = "zip"
+    log_console_enabled: bool = True
     # TODO: add other fields as and when they are put in the .env file
 
 

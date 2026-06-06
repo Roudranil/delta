@@ -21,3 +21,6 @@ reference-repos/
 
 # environment variables
 .env
+
+# noise folders
+logs
