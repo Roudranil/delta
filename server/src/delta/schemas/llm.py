@@ -152,7 +152,7 @@ class ModelDeployment(BaseModel):
     # optional quantisation string, purely informational for now.
     quantisation: str | None = None
 
-    # ── Per-deployment pricing (per token, in USD) ──
+    # -- Per-deployment pricing (per token, in USD) --
     # these are fed into litellm.model_cost via register_model() so
     # the cost calculator can compute response_cost automatically.
     # None means "i don't know" — cost will be 0 until the model is
@@ -164,7 +164,7 @@ class ModelDeployment(BaseModel):
     # caching (anthropic, deepseek) have this; for most it's None.
     cache_hit_input_cost_per_token: float | None = None
 
-    # ── Routing knobs ──
+    # -- Routing knobs --
     # these control how the litellm Router picks among deployments
     # within the same model group (tier).
     # relative pick frequency within an order tier.  default 1 = even.
@@ -255,7 +255,7 @@ class ModelDeployment(BaseModel):
         from the returned dict.  although ``LiteLLMParamsTypedDict``
         accepts them, they **don't** flow into the cost calculator
         automatically — the calculator reads from ``litellm.model_cost``
-        instead (populated via ``to_registration_dict()`` →
+        instead (populated via ``to_registration_dict()`` ->
         ``register_model()``).  including them here would be misleading.
         """
         # start with the routing-specific params.  credentials come
