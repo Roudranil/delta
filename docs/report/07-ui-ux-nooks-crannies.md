@@ -7,7 +7,7 @@
 ### The Rendering Loop
 
 ```
-requestRender() → scheduleRender() → doRender()
+requestRender() -> scheduleRender() -> doRender()
 ```
 
 - **16ms debounce** (60fps cap)
@@ -140,7 +140,7 @@ When user interrupts (Escape), the abort signal fires immediately. The LLM strea
 The TUI renders tool calls inline as they stream. Tool name + arguments appear as the tool call starts. Results appear below once the tool finishes. Both visible simultaneously in the conversation.
 
 ### "Thinking" indicator
-A spinner/loader component is shown while the LLM is streaming but hasn't yet produced visible text output. Once text starts, the loader transitions to the message component. The `message_start` → `message_update` events drive this.
+A spinner/loader component is shown while the LLM is streaming but hasn't yet produced visible text output. Once text starts, the loader transitions to the message component. The `message_start` -> `message_update` events drive this.
 
 ### Error display
 LLM errors and tool errors both appear inline in the conversation (they're encoded in messages, not thrown). The user sees the error text and can continue the conversation.
@@ -187,7 +187,7 @@ stream.on("text_delta", delta => {...});
 HTTP to RPC mode (separate process):
 ```
 POST /api/prompt
-→ 200 OK
+-> 200 OK
 
 EventSource /api/events
 ← data: {"type":"text_delta", "delta":"..."}
@@ -230,5 +230,5 @@ For building the TUI in Python:
 
 For the event bus connecting UI to agent:
 - Python asyncio `asyncio.Queue` for events
-- Callback-based subscription (`subscribe(handler) → unsubscribe`)
+- Callback-based subscription (`subscribe(handler) -> unsubscribe`)
 - Handler errors logged but don't crash the subscriber

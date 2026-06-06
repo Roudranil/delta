@@ -33,7 +33,7 @@ graph TD
     Neon["Neon Postgres\n(sessions, metadata,\nvectors via pgvector,\nLangGraph checkpoints)"]
     R2["Cloudflare R2\n(JSONL session archives)"]
     Redis["Upstash Redis\n(active session state,\nvisited_paper_ids,\nrate limit counters)"]
-    LiteLLM["LiteLLM\n→ DeepSeek API\n(+ fallback model)"]
+    LiteLLM["LiteLLM\n-> DeepSeek API\n(+ fallback model)"]
     PaperAPIs["Paper APIs\n(Semantic Scholar,\nOpenAlex, Unpaywall,\narXiv, CORE, Crossref)"]
     Sentry["Sentry\n(error monitoring)"]
     UptimeRobot["UptimeRobot\n(health pings)"]
@@ -52,8 +52,8 @@ graph TD
     Render -->|"SSE stream"| Browser
     Render -->|"exceptions"| Sentry
     UptimeRobot -->|"GET /health\nevery 5 min"| Render
-    GitHub -->|"push to main\n→ auto deploy"| Render
-    GitHub -->|"push to main\n→ auto deploy"| CF_Pages
+    GitHub -->|"push to main\n-> auto deploy"| Render
+    GitHub -->|"push to main\n-> auto deploy"| CF_Pages
 ```
 
 ---
@@ -151,8 +151,8 @@ graph TD
 ## Environment Variables
 
 Two separate places to set these:
-- **Render dashboard** → Environment → Secret Files or Environment Variables (backend)
-- **Cloudflare Pages dashboard** → Settings → Environment Variables (frontend, injected at build time)
+- **Render dashboard** -> Environment -> Secret Files or Environment Variables (backend)
+- **Cloudflare Pages dashboard** -> Settings -> Environment Variables (frontend, injected at build time)
 
 Do not commit any of these to git. Use `.env` locally (gitignored).
 
@@ -176,16 +176,16 @@ DATABASE_URL=postgresql://user:pass@ep-xxx.pooler.neon.tech/neondb?sslmode=requi
 DATABASE_URL_DIRECT=postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
 
 # --- Cloudflare R2 ---
-R2_ACCOUNT_ID=...                 # found in Cloudflare dashboard → R2 overview
-R2_ACCESS_KEY_ID=...              # R2 API token → Access Key ID
-R2_SECRET_ACCESS_KEY=...          # R2 API token → Secret Access Key
+R2_ACCOUNT_ID=...                 # found in Cloudflare dashboard -> R2 overview
+R2_ACCESS_KEY_ID=...              # R2 API token -> Access Key ID
+R2_SECRET_ACCESS_KEY=...          # R2 API token -> Secret Access Key
 R2_BUCKET_NAME=delta-sessions
 R2_ENDPOINT_URL=https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
                                   # boto3 needs this as endpoint_url
 
 # --- Upstash Redis ---
 UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
-UPSTASH_REDIS_REST_TOKEN=...      # from Upstash dashboard → REST API section
+UPSTASH_REDIS_REST_TOKEN=...      # from Upstash dashboard -> REST API section
 # Session state TTL (seconds)
 REDIS_SESSION_TTL=3600            # 60 minutes
 

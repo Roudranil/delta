@@ -27,7 +27,7 @@
 ## 3. Integration Test Patterns
 
 **Agent Loop Integration** (`agent-loop.test.ts`):
-- Tests full message flow: input → context → LLM call → response
+- Tests full message flow: input -> context -> LLM call -> response
 - Uses `for await` to iterate event streams
 - Verifies both event sequences AND final state
 - Multi-turn simulation via `callIndex` state variable
@@ -124,8 +124,8 @@ SettingsManager.create(projectDir, agentDir): SettingsManager
 ### Installation Detection
 
 ```typescript
-detectInstallMethod() → "npm" | "pnpm" | "yarn" | "bun" | "unknown"
-getSelfUpdateCommand() → Command object with args/display
+detectInstallMethod() -> "npm" | "pnpm" | "yarn" | "bun" | "unknown"
+getSelfUpdateCommand() -> Command object with args/display
 ```
 
 ---
@@ -144,9 +144,9 @@ interface AgentTool<TParameters extends TSchema, TDetails> {}
 ```
 
 **Coercion Rules**:
-- `"42"` → `42` (string to number) ✓
-- `true` → `1` (bool to number) ✓
-- `"1"` → `true` (MUST be `"true"`/`"false"`) ✗ unless exact string
+- `"42"` -> `42` (string to number) ✓
+- `true` -> `1` (bool to number) ✓
+- `"1"` -> `true` (MUST be `"true"`/`"false"`) ✗ unless exact string
 - Coercion happens **before** validation
 - Failures throw `ValidationError`
 
@@ -171,7 +171,7 @@ packages/
 **Module Exports**: Index files re-export all public APIs organized by category.
 
 **Path Aliases** (`tsconfig.json`):
-- `@earendil-works/pi-ai` → `packages/ai/src/index.ts`
+- `@earendil-works/pi-ai` -> `packages/ai/src/index.ts`
 - Resolved during tests via vitest alias config
 
 ---

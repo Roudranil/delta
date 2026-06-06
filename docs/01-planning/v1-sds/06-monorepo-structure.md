@@ -36,9 +36,9 @@ delta/
 │   │   │
 │   │   ├── extract/                # Full text extraction pipeline
 │   │   │                           # Converts raw content into clean text.
-│   │   │                           # arXiv HTML → clean text (beautifulsoup4)
-│   │   │                           # PDF bytes → text (pymupdf)
-│   │   │                           # Text → chunks → embeddings
+│   │   │                           # arXiv HTML -> clean text (beautifulsoup4)
+│   │   │                           # PDF bytes -> text (pymupdf)
+│   │   │                           # Text -> chunks -> embeddings
 │   │   │                           # Called by tools/fetch_paper only.
 │   │   │
 │   │   ├── db/                     # Storage layer

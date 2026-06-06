@@ -17,7 +17,7 @@ The agent does NOT use web search by default on every query. It's triggered in s
 | Query needs background context, not just papers      | "what is ALD?" — better answered by a clear explainer than a primary paper |
 | Paper APIs return < 3 results                         | Topic may be too new or niche for Semantic Scholar's index                 |
 | User explicitly asks for recent news or developments | Paper APIs lag by months; web catches preprints, lab announcements         |
-| A web URL is found that might be a paper             | Extract DOI → hand off to paper waterfall                                  |
+| A web URL is found that might be a paper             | Extract DOI -> hand off to paper waterfall                                  |
 | Query is about equipment, software, or techniques    | Not in paper form — vendor docs, forum answers, tutorials                  |
 
 ## Exa (Primary)
@@ -164,9 +164,9 @@ ARXIV_PATTERNS = [
 ]
 
 PUBLISHER_DOI_PATTERNS = {
-    # nature.com/articles/s41586-023-XXXXX → can construct DOI
+    # nature.com/articles/s41586-023-XXXXX -> can construct DOI
     r"nature\.com/articles/(s\d+-\d+-\d+-\d+)": lambda m: f"10.1038/{m.group(1)}",
-    # aps.org/doi/10.xxxx → extract directly
+    # aps.org/doi/10.xxxx -> extract directly
     r"aps\.org/doi/(10\.\d{4,}/[^\s\"'>]+)": lambda m: m.group(1),
 }
 
@@ -187,7 +187,7 @@ def extract_paper_id_from_url(url: str) -> dict | None:
 **Flow:**
 
 ```
-web_search(query) → list[WebResult]
+web_search(query) -> list[WebResult]
   for each result:
     paper_ref = extract_paper_id_from_url(result.url)
     if paper_ref:
@@ -210,15 +210,15 @@ class WebResult:
     published_date: str | None   # None if Tavily; present if Exa
     source: str                  # "exa" | "tavily"
 
-# If DOI extracted → handed to paper waterfall → returns PaperResult (see SDS-03)
-# If no DOI → stays as WebResult, used for context in synthesis prompt
+# If DOI extracted -> handed to paper waterfall -> returns PaperResult (see SDS-03)
+# If no DOI -> stays as WebResult, used for context in synthesis prompt
 ```
 
 The LLM receives both `PaperResult` objects (from paper waterfall) and `WebResult` objects (from web search) in its context. Both are cited in output, but differently:
-- Papers → numbered citations with full metadata: `[1] Smith et al., 2023 — Nature Materials`
-- Web sources → separate numbered series: `[W1] Page Title — https://... (2023)`
+- Papers -> numbered citations with full metadata: `[1] Smith et al., 2023 — Nature Materials`
+- Web sources -> separate numbered series: `[W1] Page Title — https://... (2023)`
 
-The citation invariant applies to web results too: the LLM references web results by `web_id` only. Code resolves `web_id` → full URL + title. The LLM cannot fabricate a web citation any more than it can fabricate a paper citation.
+The citation invariant applies to web results too: the LLM references web results by `web_id` only. Code resolves `web_id` -> full URL + title. The LLM cannot fabricate a web citation any more than it can fabricate a paper citation.
 
 ## What the Agent Tool Looks Like
 
@@ -234,9 +234,9 @@ async def web_search(
     ...
 ```
 
-- `mode="research"` → uses Exa with `category="research paper"`, semantic search
-- `mode="general"` → uses Tavily, good for background context, documentation, tutorials
-- Any result with an extractable DOI/arXiv ID → automatically handed to paper waterfall
+- `mode="research"` -> uses Exa with `category="research paper"`, semantic search
+- `mode="general"` -> uses Tavily, good for background context, documentation, tutorials
+- Any result with an extractable DOI/arXiv ID -> automatically handed to paper waterfall
 
 ## Rate Limiting
 

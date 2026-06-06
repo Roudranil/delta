@@ -53,10 +53,10 @@ Feynman CLI (Node.js TypeScript)
 | `/outputs` | Browse all research artifacts |
 
 **For Delta's UX design:** These are exactly the modes Delta needs, translated to non-technical UX:
-- "Find papers" → `/lit` equivalent
-- "Understand a paper" → `/review` equivalent  
-- "What's new on this topic" → `/watch` equivalent
-- "Generate literature review" → `/deepresearch` + `/draft`
+- "Find papers" -> `/lit` equivalent
+- "Understand a paper" -> `/review` equivalent  
+- "What's new on this topic" -> `/watch` equivalent
+- "Generate literature review" -> `/deepresearch` + `/draft`
 
 The key difference: Feynman uses slash commands in a CLI. Delta must expose these as buttons.
 
@@ -215,6 +215,6 @@ Feynman enforces this at the Verifier agent level. All claims must link to an ac
 
 ## 12. The Core Design Lesson
 
-Feynman's skill quality is high because each skill is a carefully written prompt template with explicit phases (search → extract → synthesize → verify). The intelligence is in the prompts, not the runtime.
+Feynman's skill quality is high because each skill is a carefully written prompt template with explicit phases (search -> extract -> synthesize -> verify). The intelligence is in the prompts, not the runtime.
 
 Delta should invest heavily in prompt engineering for each research mode. The LangGraph scaffolding is cheap; the prompt quality determines output quality. Study Feynman's skill files carefully when writing Delta's prompts.

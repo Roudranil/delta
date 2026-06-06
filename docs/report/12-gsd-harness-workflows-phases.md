@@ -13,7 +13,7 @@ Source: `reference-repos/get-shit-done-redux`
 ## 1. The Six-Command Main Loop
 
 ```
-/gsd-new-project → /gsd-discuss-phase → /gsd-plan-phase → /gsd-execute-phase → /gsd-verify-work → /gsd-ship → repeat
+/gsd-new-project -> /gsd-discuss-phase -> /gsd-plan-phase -> /gsd-execute-phase -> /gsd-verify-work -> /gsd-ship -> repeat
 ```
 
 Each command is a discrete workflow markdown file (50–500 lines) that orchestrates subagents or executes inline. Three nested orchestration layers:
@@ -56,8 +56,8 @@ Each command is a discrete workflow markdown file (50–500 lines) that orchestr
 10. Update STATE.md; optionally chain to plan-phase with `--chain`
 
 **Unique mechanics**:
-- **Incremental checkpoint**: After each area, write `{padded_phase}-DISCUSS-CHECKPOINT.json` → session can resume mid-discussion
-- **Scope guardrail**: If user mentions out-of-phase feature → redirect to deferred, never expand scope
+- **Incremental checkpoint**: After each area, write `{padded_phase}-DISCUSS-CHECKPOINT.json` -> session can resume mid-discussion
+- **Scope guardrail**: If user mentions out-of-phase feature -> redirect to deferred, never expand scope
 - **Prior-decision carrying**: If Phase 2 decided "infinite scroll", Phase 3 doesn't re-ask pagination
 
 ---
@@ -66,23 +66,23 @@ Each command is a discrete workflow markdown file (50–500 lines) that orchestr
 
 **Purpose**: Transform CONTEXT.md + optional research into executable PLAN.md files (one per plan/slice).
 
-**Default flow**: Research (optional) → Plan → Verify (loop) → Done
+**Default flow**: Research (optional) -> Plan -> Verify (loop) -> Done
 
 **Subagent chain**:
-1. **gsd-phase-researcher** (if research enabled) → produces RESEARCH.md with domain exploration, patterns, risks, library recommendations
-2. **gsd-planner** → reads CONTEXT.md + RESEARCH.md → produces PLAN.md with tasks + estimates
-3. **gsd-plan-checker** → verifies plan quality against gates (mandatory):
+1. **gsd-phase-researcher** (if research enabled) -> produces RESEARCH.md with domain exploration, patterns, risks, library recommendations
+2. **gsd-planner** -> reads CONTEXT.md + RESEARCH.md -> produces PLAN.md with tasks + estimates
+3. **gsd-plan-checker** -> verifies plan quality against gates (mandatory):
    - Does each task have a clear objective?
    - Are estimates realistic?
    - Hidden dependencies?
    - Will this actually achieve the phase goal?
 
-**Revision loop**: Fails verification → plan-checker generates fix suggestions → planner re-plans → re-verify (max 3 iterations)
+**Revision loop**: Fails verification -> plan-checker generates fix suggestions -> planner re-plans -> re-verify (max 3 iterations)
 
 **Express paths** (bypass discuss-phase):
-- `--prd <file>` → parse PRD into CONTEXT.md automatically
-- `--ingest <adr-paths>` → parse ADRs into CONTEXT.md
-- `--research-phase <N>` → research-only mode (no planner spawn)
+- `--prd <file>` -> parse PRD into CONTEXT.md automatically
+- `--ingest <adr-paths>` -> parse ADRs into CONTEXT.md
+- `--research-phase <N>` -> research-only mode (no planner spawn)
 
 **Key gates**:
 - **Closed-phase gate** (#3569): If phase is `Complete` (has VERIFICATION.md with `status: passed`), refuse to replan unless `--force`
@@ -99,7 +99,7 @@ Each command is a discrete workflow markdown file (50–500 lines) that orchestr
 - Plans grouped into **waves** (dependencies resolved at plan-time)
 - Within a wave: parallel execution (if `parallelization: true`) or sequential
 - Between waves: sequential (wave N+1 waits for wave N)
-- **Wave safety check**: Detect `files_modified` overlap across plans → force sequential for that wave (safety net for planning defects)
+- **Wave safety check**: Detect `files_modified` overlap across plans -> force sequential for that wave (safety net for planning defects)
 
 **Subagent contract**:
 ```
@@ -115,14 +115,14 @@ For each plan in wave:
 ```
 
 **Isolation strategy**:
-- **Git worktrees** (default): each executor works in `worktree-agent-{phase}-{plan}` → parallel safe
-- **Submodule exception**: If plan touches `.gitmodules` path → drop isolation, run sequential
-- **Codex exception**: Codex has no Agent isolation → sequential inline fallback
+- **Git worktrees** (default): each executor works in `worktree-agent-{phase}-{plan}` -> parallel safe
+- **Submodule exception**: If plan touches `.gitmodules` path -> drop isolation, run sequential
+- **Codex exception**: Codex has no Agent isolation -> sequential inline fallback
 
 **Runtime compatibility**:
-- **Claude Code**: `Agent(subagent_type="gsd-executor", isolation="worktree")` → parallel, blocks until complete
-- **Copilot**: Subagent completion signals unreliable → fallback to sequential inline via `execute-plan.md`
-- **Others**: If `Agent` tool unavailable → sequential inline fallback
+- **Claude Code**: `Agent(subagent_type="gsd-executor", isolation="worktree")` -> parallel, blocks until complete
+- **Copilot**: Subagent completion signals unreliable -> fallback to sequential inline via `execute-plan.md`
+- **Others**: If `Agent` tool unavailable -> sequential inline fallback
 
 **Checkpoint heartbeats** (#2410) — prevent "Stream idle timeout" on large phases:
 ```
@@ -131,9 +131,9 @@ For each plan in wave:
 ```
 
 **Optional modes**:
-- `--wave N` → execute only Wave N (quota management)
-- `--gaps-only` → execute only gap-closure plans (from `/gsd:verify-work` fix generation)
-- `--interactive` → inline execution with user checkpoints between tasks (pair-programming style)
+- `--wave N` -> execute only Wave N (quota management)
+- `--gaps-only` -> execute only gap-closure plans (from `/gsd:verify-work` fix generation)
+- `--interactive` -> inline execution with user checkpoints between tasks (pair-programming style)
 
 ---
 
@@ -147,16 +147,16 @@ Answers "Where are we?" and routes to next action.
 1. Load STATE.md (current_phase, completed_plans, blocked_plans)
 2. Analyze ROADMAP.md (phase order, dependencies, completion status)
 3. ROUTE:
-   a. No project? → /gsd:new-project
+   a. No project? -> /gsd:new-project
    b. Phase incomplete:
-      - No CONTEXT? → /gsd:discuss-phase
-      - No PLAN? → /gsd:plan-phase
-      - Plans incomplete? → /gsd:execute-phase
-      - Execution blocked? → /gsd:debug
-      - Ready for QA? → /gsd:verify-work
-   c. Phase complete but not shipped? → /gsd:ship
-   d. Milestone complete? → /gsd:complete-milestone
-   e. Next milestone queued? → /gsd:new-milestone
+      - No CONTEXT? -> /gsd:discuss-phase
+      - No PLAN? -> /gsd:plan-phase
+      - Plans incomplete? -> /gsd:execute-phase
+      - Execution blocked? -> /gsd:debug
+      - Ready for QA? -> /gsd:verify-work
+   c. Phase complete but not shipped? -> /gsd:ship
+   d. Milestone complete? -> /gsd:complete-milestone
+   e. Next milestone queued? -> /gsd:new-milestone
 ```
 
 ### MANAGER Workflow — Interactive Command Center
@@ -172,8 +172,8 @@ Dashboard with ASCII progress bar + phase status table:
 ```
 
 Actions via AskUserQuestion:
-- `Continue` → dispatch ALL recommended actions (background + inline, parallel)
-- `Refresh dashboard` → poll background agent updates
+- `Continue` -> dispatch ALL recommended actions (background + inline, parallel)
+- `Refresh dashboard` -> poll background agent updates
 - `Exit manager`
 
 ---
@@ -183,11 +183,11 @@ Actions via AskUserQuestion:
 Disk status field in CONTEXT.md frontmatter:
 
 ```
-no_directory  → discuss-phase runs → discussed
-discussed     → plan-phase runs  → planned
-planned       → execute-phase    → partial (some done) or complete (all done)
-complete      → verify-work      → needs_review (gaps found) or verified
-verified      → ship             → shipped
+no_directory  -> discuss-phase runs -> discussed
+discussed     -> plan-phase runs  -> planned
+planned       -> execute-phase    -> partial (some done) or complete (all done)
+complete      -> verify-work      -> needs_review (gaps found) or verified
+verified      -> ship             -> shipped
 ```
 
 ---
@@ -208,7 +208,7 @@ verified      → ship             → shipped
 
 ### Context Injection Pattern
 
-Orchestrator → subagent handoff:
+Orchestrator -> subagent handoff:
 1. Orchestrator loads minimal init JSON (paths only, ~2% context)
 2. Subagent receives full `<files_to_read>` block in its prompt
 3. Subagent has 100% fresh context for its task
@@ -227,7 +227,7 @@ fi
 
 ### Prior Context Carryover
 
-- **Discuss-phase**: Load most recent 3 prior CONTEXT.md files → extract `<decisions>` → annotate gray areas ("You already chose X in Phase 5")
+- **Discuss-phase**: Load most recent 3 prior CONTEXT.md files -> extract `<decisions>` -> annotate gray areas ("You already chose X in Phase 5")
 - **Plan-phase**: Load this phase's CONTEXT.md + all `Depends on:` phases from ROADMAP
 - **Execute-phase**: Executor reads this phase's CONTEXT + RESEARCH + all prior SUMMARY.md files (if CONTEXT_WINDOW >= 500K)
 
@@ -270,8 +270,8 @@ Every workflow checks `last_activity`. If stale, offers:
 With `--cross-ai` flag:
 1. Construct task prompt from PLAN.md
 2. Run external command with timeout (default 300s)
-3. Success → validate summary, write SUMMARY.md, mark plan complete
-4. Failure → offer retry / skip (fallback to executor) / abort
+3. Success -> validate summary, write SUMMARY.md, mark plan complete
+4. Failure -> offer retry / skip (fallback to executor) / abort
 
 ---
 
@@ -358,6 +358,6 @@ Profiles: `core` (new-project, discuss-phase, plan-phase, execute-phase, verify-
 | Phase transition | Manual ("what next?") | Automatic routing via progress/manager state machine |
 | Parallelization | Hard to coordinate | Wave-based DAG with dependency tracking |
 | Fault tolerance | Session dies = restart | Incremental checkpoints + git commits verify work |
-| Verification | Hope it works | Mandatory verify step, gaps → fix plans → re-execute |
+| Verification | Hope it works | Mandatory verify step, gaps -> fix plans -> re-execute |
 | Decision capture | Lost in chat history | Locked in CONTEXT.md per phase, consulted by downstream |
 | Cost optimization | Wasteful | Adaptive context windows, express paths, orchestrator stays lean |

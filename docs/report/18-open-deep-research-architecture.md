@@ -160,7 +160,7 @@ async def individual_researcher(state: ResearcherState, config: RunnableConfig) 
     cfg = Configuration.from_runnable_config(config)
     
     while state["tool_call_iterations"] < cfg.max_researcher_iterations:
-        # ReAct: think → call tool → observe → repeat
+        # ReAct: think -> call tool -> observe -> repeat
         response = await research_model.invoke(state["researcher_messages"])
         if response.tool_calls:
             tool_results = await execute_tools(response.tool_calls)
@@ -176,9 +176,9 @@ async def individual_researcher(state: ResearcherState, config: RunnableConfig) 
 
 **For Delta, this maps to:**
 - Each "researcher" = searches one topic across Semantic Scholar + supplementary sources
-- Each researcher runs `max_iterations` search rounds (broader → narrower queries)
+- Each researcher runs `max_iterations` search rounds (broader -> narrower queries)
 - Compression = summarize the found papers before returning to supervisor
-- Supervisor collects all compressed summaries → final report writer
+- Supervisor collects all compressed summaries -> final report writer
 
 ---
 
@@ -194,7 +194,7 @@ class ResearchQuestion(BaseModel):
 
 The brief transforms a vague user query into a structured research direction. For "thin film deposition of MoS2 for photovoltaics", the brief would specify: key subtopics, target journals, time range, specific techniques to cover.
 
-**For Delta's ASK mode:** This is the output of the ASK→PLAN transition. The user talks to Delta, Delta generates a research brief, then the EXECUTE phase fans out based on the brief.
+**For Delta's ASK mode:** This is the output of the ASK->PLAN transition. The user talks to Delta, Delta generates a research brief, then the EXECUTE phase fans out based on the brief.
 
 ---
 
@@ -318,13 +318,13 @@ The ReAct loop pattern is identical — each tool is a Python function registere
 ## 12. The Supervision Loop — Delta's Core Research Loop
 
 ```
-ASK: clarify_with_user → write_research_brief
+ASK: clarify_with_user -> write_research_brief
 PLAN: research_supervisor decides subtopics
-EXECUTE: Send × N → individual_researcher × N (parallel)
+EXECUTE: Send × N -> individual_researcher × N (parallel)
   Each researcher: search loop with max_iterations limit
   After each researcher: compress output
 AGGREGATE: supervisor collects compressed outputs
-  → iterates if gaps remain (up to max_researcher_iterations)
+  -> iterates if gaps remain (up to max_researcher_iterations)
 OUTPUT: write_final_report with inline citations
 ```
 

@@ -7,8 +7,8 @@ Main Pi Process (CLI entry point)
 ├── AgentSession (core session class)
 ├── Agent (from @earendil-works/pi-ai)
 ├── Mode Layer (one of: interactive, print, rpc)
-│   └── Interactive: TUI rendering → events → user input
-│   └── Print: JSON/text output → exit
+│   └── Interactive: TUI rendering -> events -> user input
+│   └── Print: JSON/text output -> exit
 │   └── RPC: stdin/stdout JSON-RPC protocol
 └── Subagent Tool
     └── spawn("pi", ["--mode", "json", "-p", ...])  ← separate process
@@ -36,10 +36,10 @@ All modes share the same `AgentSession` and `Agent` classes. Modes are just diff
 
 ```typescript
 resolveAppMode(parsed, stdinIsTTY):
-  if --mode rpc        → RPC
-  if --mode json|text  → Print
-  if --print or !isTTY → Print
-  else                 → Interactive (TUI)
+  if --mode rpc        -> RPC
+  if --mode json|text  -> Print
+  if --print or !isTTY -> Print
+  else                 -> Interactive (TUI)
 ```
 
 ### Session Management
@@ -65,7 +65,7 @@ Architecture:
 3. Subscribe to AgentSession events
 4. Forward keyboard input to components
 5. Components send to AgentSession methods (prompt, abort, etc.)
-6. AgentSession emits events → components re-render → differential update
+6. AgentSession emits events -> components re-render -> differential update
 
 ### Mode 2: Print (Headless)
 
@@ -131,7 +131,7 @@ export class TUI extends Container {
 6. Only redraw changed line range
 7. Use synchronized output (CSI 2026) to reduce flicker
 
-**16ms debounce** (60fps cap) via `requestRender()` → `scheduleRender()` → `doRender()`
+**16ms debounce** (60fps cap) via `requestRender()` -> `scheduleRender()` -> `doRender()`
 
 **`CURSOR_MARKER = "\x1b_pi:c\x07"`** (APC sequence, zero-width):
 - Components emit this at cursor position when focused
@@ -336,11 +336,11 @@ AgentSession.prompt() / etc.
     ↓
 AgentSession emits event
     ↓
-Component subscribes: event → update state
+Component subscribes: event -> update state
     ↓
-Component.render() → new lines
+Component.render() -> new lines
     ↓
-TUI differential rendering → terminal output
+TUI differential rendering -> terminal output
 ```
 
 ---

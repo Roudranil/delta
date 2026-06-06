@@ -26,7 +26,7 @@
 | **Snapshots** | None | Git-based with rollback |
 | **Worktrees** | None | Git worktrees for isolated work |
 | **Websearch** | None | Exa + Parallel Search |
-| **Webfetch** | None | HTML→Markdown conversion |
+| **Webfetch** | None | HTML->Markdown conversion |
 | **apply_patch** | None | Custom patch format for GPT models |
 | **Plugins** | Script-based | Full npm packages + TUI plugins |
 | **IDE integration** | None | VSCode, Cursor, Zed, Windsurf |
@@ -178,7 +178,7 @@ if (Exit.isFailure(exit)) {
 ```typescript
 // Architecture:
 // - Deferred-based blocking: ask() returns a Deferred that resolves when user replies
-// - Pending request tracking: Map of QuestionID → (Request, Deferred)
+// - Pending request tracking: Map of QuestionID -> (Request, Deferred)
 // - Bus event publishing: Asked, Replied, Rejected
 // - Session-scoped isolation: Questions tied to session ID
 // - Automatic cleanup on instance dispose: Rejects all pending on shutdown
@@ -286,7 +286,7 @@ interface Command {
 // Windows: GitBash detection, taskkill-based process trees
 ```
 
-**Process tree killing**: `SIGTERM` → sleep → `SIGKILL` with proper cleanup
+**Process tree killing**: `SIGTERM` -> sleep -> `SIGKILL` with proper cleanup
 
 ---
 
@@ -367,14 +367,14 @@ export const defaultLayer = layer.pipe(Layer.provide(Dependency.defaultLayer))
 ### Error Modeling
 
 ```typescript
-// Expected failures → error channel
+// Expected failures -> error channel
 const get = Effect.fn("Session.get")(function* (id) {
   const row = yield* Storage.get(id).pipe(
     Effect.catchTag("NotFound", () => new NotFoundError())
   )
 })
 
-// Unknown/impossible failures → defects (crashes)
+// Unknown/impossible failures -> defects (crashes)
 if (!row || !row.id) {
   return yield* Effect.die(new Error("Impossible state"))
 }
@@ -422,13 +422,13 @@ Each migration:
 
 ## Key Patterns Worth Porting to Python
 
-1. **Effect.fn tracing at every public boundary** → Python: `@trace("ServiceName.method")` decorator + OpenTelemetry
-2. **Schema.TaggedErrorClass for domain errors** → Python: `@dataclass` error types with discriminator field
-3. **InstanceState for per-directory services** → Python: `contextvar` + dict keyed by directory, with cleanup hooks
-4. **Three-tier testing strategy** → Python: `pytest` with `pure/live/instance` fixture scopes
-5. **Bus event publishing** → Python: `asyncio.Queue` + typed event dataclasses
-6. **Schema as source of truth** → Python: Pydantic models (generate JSON Schema, validate, type-safe)
-7. **Service/Layer pattern** → Python: dependency injection via `__init__` or a DI framework
-8. **Question/confirmation UX** → Python: `asyncio.Future` + event publication + await in tool execution
-9. **Slash command registry** → Python: dict of command name → handler, with sources (config/MCP/skill)
-10. **Feature flags via env vars** → Python: `os.environ.get("DELTA_FEATURE_X", "false")` consistently
+1. **Effect.fn tracing at every public boundary** -> Python: `@trace("ServiceName.method")` decorator + OpenTelemetry
+2. **Schema.TaggedErrorClass for domain errors** -> Python: `@dataclass` error types with discriminator field
+3. **InstanceState for per-directory services** -> Python: `contextvar` + dict keyed by directory, with cleanup hooks
+4. **Three-tier testing strategy** -> Python: `pytest` with `pure/live/instance` fixture scopes
+5. **Bus event publishing** -> Python: `asyncio.Queue` + typed event dataclasses
+6. **Schema as source of truth** -> Python: Pydantic models (generate JSON Schema, validate, type-safe)
+7. **Service/Layer pattern** -> Python: dependency injection via `__init__` or a DI framework
+8. **Question/confirmation UX** -> Python: `asyncio.Future` + event publication + await in tool execution
+9. **Slash command registry** -> Python: dict of command name -> handler, with sources (config/MCP/skill)
+10. **Feature flags via env vars** -> Python: `os.environ.get("DELTA_FEATURE_X", "false")` consistently

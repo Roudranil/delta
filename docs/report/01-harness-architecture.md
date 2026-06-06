@@ -76,8 +76,8 @@ Outer loop (follow-up handling):
 - Model/thinking level changes
 
 **Streaming** (`agent-loop.ts:275-368`):
-1. Apply `transformContext` if configured (AgentMessage[] → AgentMessage[])
-2. Convert to LLM format with `convertToLlm` (AgentMessage[] → Message[])
+1. Apply `transformContext` if configured (AgentMessage[] -> AgentMessage[])
+2. Convert to LLM format with `convertToLlm` (AgentMessage[] -> Message[])
 3. Stream from LLM, updating partial message in context as deltas arrive
 4. On completion, replace partial or add to context, emit `message_end`
 
@@ -196,7 +196,7 @@ Default: reserve 16k tokens, keep recent 20k tokens
 **Pending writes** (`agent-harness.ts:370-390`):
 - Messages, model changes, thinking level changes, custom entries, labels all batched
 - Flushed in `finally` block at turn end
-- If error occurs mid-turn, writes not flushed → session remains consistent
+- If error occurs mid-turn, writes not flushed -> session remains consistent
 
 **Abort/cancellation** (`agent.ts:290-298`):
 - AbortSignal threaded through execution
@@ -304,7 +304,7 @@ Standard LLM messages + custom extensions (BashExecutionMessage, CustomMessage, 
 
 ## Key Insights for Python Port
 
-1. **Layered design**: Low-level loop → Agent wrapper → Harness orchestration
+1. **Layered design**: Low-level loop -> Agent wrapper -> Harness orchestration
 2. **Event-driven**: All changes flow through event system; extend via listeners and hooks
 3. **Append-only persistence**: JSONL sessions are crash-safe, auditable
 4. **Batched writes**: Session writes batched during turns, flushed at turn end for consistency

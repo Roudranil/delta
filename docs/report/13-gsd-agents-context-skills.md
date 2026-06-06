@@ -26,7 +26,7 @@ GSD ships **33 specialized agents** organized by function. Each agent is a markd
 
 **gsd-ui-researcher**
 - Produces UI design contracts for frontend phases
-- Detects whether a design system exists (shadcn, Tailwind) → offers initialization
+- Detects whether a design system exists (shadcn, Tailwind) -> offers initialization
 - Output: UI design contract doc with component specs, layout decisions, accessibility notes
 
 **gsd-advisor-researcher**
@@ -80,7 +80,7 @@ GSD ships **33 specialized agents** organized by function. Each agent is a markd
   - Are estimates realistic?
   - Hidden dependencies?
   - Will this achieve the phase goal?
-- If fails → auto-generates fix suggestions → planner re-plans (max 3 iterations)
+- If fails -> auto-generates fix suggestions -> planner re-plans (max 3 iterations)
 
 **gsd-roadmap-planner** (inferred)
 - Generates phased ROADMAP.md from requirements/user answers
@@ -147,7 +147,7 @@ GSD ships **33 specialized agents** organized by function. Each agent is a markd
 
 **gsd-doc-verifier**
 - Verifies documentation is accurate and complete relative to implementation
-- Reads: actual code + docs → finds stale/missing/incorrect documentation
+- Reads: actual code + docs -> finds stale/missing/incorrect documentation
 
 ---
 
@@ -175,7 +175,7 @@ GSD ships **33 specialized agents** organized by function. Each agent is a markd
 **gsd-debugger**
 - Analyzes failures during execution or verify-work
 - Input: error output, relevant code, test failures
-- Uses: structured fault isolation (hypothesis → evidence → conclusion)
+- Uses: structured fault isolation (hypothesis -> evidence -> conclusion)
 - Output: root cause report + reproduction steps
 
 **gsd-debug-session-manager**
@@ -216,7 +216,7 @@ GSD ships **33 specialized agents** organized by function. Each agent is a markd
 
 **gsd-intel-updater**
 - Updates existing RESEARCH.md with fresh findings (re-research)
-- Used when implementation reveals assumptions were wrong → mid-phase research correction
+- Used when implementation reveals assumptions were wrong -> mid-phase research correction
 
 ---
 
@@ -284,7 +284,7 @@ When context window is small:
 ### Sequential Handoff Chain (Plan-Phase)
 
 ```
-gsd-phase-researcher → RESEARCH.md → gsd-planner → PLAN.md → gsd-plan-checker
+gsd-phase-researcher -> RESEARCH.md -> gsd-planner -> PLAN.md -> gsd-plan-checker
                                                               ↓ (if fails)
                                                          gsd-planner (re-plan)
                                                               ↓ (max 3×)
@@ -294,31 +294,31 @@ gsd-phase-researcher → RESEARCH.md → gsd-planner → PLAN.md → gsd-plan-ch
 ### Parallel Fan-Out (New Project Research)
 
 ```
-                    → gsd-project-researcher (stack)    ↘
-/gsd:new-project    → gsd-project-researcher (features) → gsd-research-synthesizer → RESEARCH.md
-                    → gsd-project-researcher (arch)     ↗
-                    → gsd-project-researcher (pitfalls) ↗
+                    -> gsd-project-researcher (stack)    ↘
+/gsd:new-project    -> gsd-project-researcher (features) -> gsd-research-synthesizer -> RESEARCH.md
+                    -> gsd-project-researcher (arch)     ↗
+                    -> gsd-project-researcher (pitfalls) ↗
 ```
 
 ### Parallel Wave Execution (Execute-Phase)
 
 ```
 Wave 1:
-  plan-1 → gsd-executor (worktree-1) → SUMMARY-1.md + git commits
-  plan-2 → gsd-executor (worktree-2) → SUMMARY-2.md + git commits
-  plan-3 → gsd-executor (worktree-3) → SUMMARY-3.md + git commits
+  plan-1 -> gsd-executor (worktree-1) -> SUMMARY-1.md + git commits
+  plan-2 -> gsd-executor (worktree-2) -> SUMMARY-2.md + git commits
+  plan-3 -> gsd-executor (worktree-3) -> SUMMARY-3.md + git commits
   (orchestrator merges worktrees)
 
 Wave 2 (blocked on Wave 1):
-  plan-4 → gsd-executor (worktree-4) → ...
+  plan-4 -> gsd-executor (worktree-4) -> ...
 ```
 
 ### Debug Loop
 
 ```
-Execution fails → gsd-debugger (analyze) → gsd-debug-session-manager (coordinate)
-                                         → fix plan → gsd-executor (re-execute)
-                                         → gsd-code-reviewer (verify fix)
+Execution fails -> gsd-debugger (analyze) -> gsd-debug-session-manager (coordinate)
+                                         -> fix plan -> gsd-executor (re-execute)
+                                         -> gsd-code-reviewer (verify fix)
 ```
 
 ---

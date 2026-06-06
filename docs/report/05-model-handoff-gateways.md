@@ -68,7 +68,7 @@ getApiProvider("anthropic-messages")  // Returns the provider
 **Example resolution**:
 - Input: `"anthropic/claude-sonnet-4-5:high"`
 - Parsed: `{ provider: "anthropic", modelId: "claude-sonnet-4-5", thinkingLevel: "high" }`
-- API lookup: `getApiProvider("anthropic-messages")` → Anthropic stream handler
+- API lookup: `getApiProvider("anthropic-messages")` -> Anthropic stream handler
 
 **Stream dispatch** (`stream.ts:25-31`):
 
@@ -153,7 +153,7 @@ function resolveDeploymentName(model, options): string {
 
 ### Amazon Bedrock
 
-Auth flow: `AWS_PROFILE` → `AWS_ACCESS_KEY_ID`/`SECRET` → `AWS_BEARER_TOKEN_BEDROCK` → ECS task roles → IRSA
+Auth flow: `AWS_PROFILE` -> `AWS_ACCESS_KEY_ID`/`SECRET` -> `AWS_BEARER_TOKEN_BEDROCK` -> ECS task roles -> IRSA
 
 ### Google Vertex AI
 
@@ -303,9 +303,9 @@ Benefits: Startup time unaffected; only pay cost for providers actually used.
 |-----------|------|---------|
 | `StreamFunction` | `types.ts:206-210` | Interface each provider must implement |
 | `ApiProvider` | `api-registry.ts:23-27` | Registry entry with stream + streamSimple |
-| `ApiRegistry` | `api-registry.ts:40-98` | Global map of api → provider |
+| `ApiRegistry` | `api-registry.ts:40-98` | Global map of api -> provider |
 | `Model<TApi>` | `types.ts:528-558` | Model metadata (id, provider, capabilities) |
-| `parseModelPattern()` | `model-resolver.ts:189-242` | Parse `"provider/id:level"` → Model + ThinkingLevel |
+| `parseModelPattern()` | `model-resolver.ts:189-242` | Parse `"provider/id:level"` -> Model + ThinkingLevel |
 | `transformMessages()` | `transform-messages.ts:64-220` | Normalize messages for cross-provider replay |
 | `stream()` / `streamSimple()` | `stream.ts:25-59` | Entry points that dispatch to provider |
 | `register-builtins.ts` | `providers/register-builtins.ts` | Lazy-load & register all built-in providers |

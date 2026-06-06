@@ -5,11 +5,11 @@
 | Mode | Name | What it does | Time | Output |
 |------|------|-------------|------|--------|
 | EXPLORE | (name TBD — working name: EXPLORE) | ReAct loop, full tool access, conversational, builds library | Seconds–2 min | Inline markdown response with citations |
-| DEEP | DEEP | Structured pipeline: clarify → plan → fan-out researchers → synthesize → artifact | 10–20 min | MDX document artifact stored in library |
+| DEEP | DEEP | Structured pipeline: clarify -> plan -> fan-out researchers -> synthesize -> artifact | 10–20 min | MDX document artifact stored in library |
 
 Both modes use the same `AsyncPostgresSaver` checkpointer, keyed by `session_id = thread_id`. They are separate compiled LangGraph graphs. A session has a fixed mode at creation — `session.mode` is immutable.
 
-After a DEEP session produces its artifact, subsequent messages run through EXPLORE — the artifact is a `user_document` in her library, so `search_library` finds it automatically. No special wiring needed. `session_phase` tracks this: `researching → complete → followup`.
+After a DEEP session produces its artifact, subsequent messages run through EXPLORE — the artifact is a `user_document` in her library, so `search_library` finds it automatically. No special wiring needed. `session_phase` tracks this: `researching -> complete -> followup`.
 
 ---
 
@@ -36,10 +36,10 @@ RESEARCHER_TOOLS = search_papers, fetch_paper, get_citations, get_referenced_by,
 | Tool | Signature | Used in | Notes |
 |------|-----------|---------|-------|
 | `search_papers` | `(query, limit, year_from, year_to)` | EXPLORE, DEEP researchers | S2 + OpenAlex |
-| `fetch_paper` | `(doi, arxiv_id, s2_id, query)` | EXPLORE, DEEP researchers | Full waterfall — cache → S2 → OpenAlex → arXiv → full text |
+| `fetch_paper` | `(doi, arxiv_id, s2_id, query)` | EXPLORE, DEEP researchers | Full waterfall — cache -> S2 -> OpenAlex -> arXiv -> full text |
 | `get_citations` | `(paper_id, limit)` | EXPLORE, DEEP researchers | Backward snowball — papers this paper cites |
 | `get_referenced_by` | `(paper_id, limit)` | EXPLORE, DEEP researchers | Forward snowball — papers citing this paper |
-| `search_web` | `(query, date_from, domains)` | EXPLORE, DEEP researchers | Exa → Tavily fallback |
+| `search_web` | `(query, date_from, domains)` | EXPLORE, DEEP researchers | Exa -> Tavily fallback |
 | `search_library` | `(query, limit)` | EXPLORE, DEEP synthesize | RAG over user's saved papers + documents |
 | `read_document` | `(document_id)` | EXPLORE, DEEP synthesize | Full text of a saved document from R2 |
 
@@ -167,8 +167,8 @@ load_context
   ↓
 agent  ←───────────────────┐
   ↓ (tools_condition)      │
-  ├── tool_calls → tools ──┘
-  └── no tool_calls → write_output
+  ├── tool_calls -> tools ──┘
+  └── no tool_calls -> write_output
                        ↓
                       END
 ```
@@ -233,15 +233,15 @@ START
   ↓
 load_context_deep
   ↓
-clarify  ──→ [INTERRUPT: questions for user]
+clarify  ──-> [INTERRUPT: questions for user]
   ↓ [RESUME: user answers]
 plan
   ↓
-confirm_plan  ──→ [INTERRUPT: show plan to user]
+confirm_plan  ──-> [INTERRUPT: show plan to user]
   ↓ [RESUME: approved or feedback]
   │
-  ├── feedback → plan (loop back, re-plan with feedback)
-  └── approved → fan_out_researchers
+  ├── feedback -> plan (loop back, re-plan with feedback)
+  └── approved -> fan_out_researchers
                       ↓ [Send × N — one per subtopic, parallel]
               researcher[0..N]  ← ReAct mini-loop
                       ↓ [findings merge via operator.add]
@@ -306,8 +306,8 @@ START
   ↓
 researcher_agent  ←───────────────────┐
   ↓ (tools_condition)                  │
-  ├── tool_calls → researcher_tools ──┘
-  └── no tool_calls → compress_findings
+  ├── tool_calls -> researcher_tools ──┘
+  └── no tool_calls -> compress_findings
                           ↓
                          END
 ```
@@ -411,13 +411,13 @@ return EventSourceResponse(stream_from_queue(stream_queue))
 
 When graph hits `interrupt()`:
 - LangGraph saves checkpoint, raises `GraphInterrupt`
-- Graph runner catches it → updates `runs.status = 'interrupted'`, stores `interrupt_type`
+- Graph runner catches it -> updates `runs.status = 'interrupted'`, stores `interrupt_type`
 - Streams interrupt event to SSE: `{"type": "interrupt", "interrupt_type": "clarification", "questions": [...]}`
 - Graph runner exits — SSE stream closes naturally
 - Frontend renders the questions as a form
 
 On reconnect / next user message:
-- `run.status == 'interrupted'` → resume with `Command(resume=answers)`
+- `run.status == 'interrupted'` -> resume with `Command(resume=answers)`
 - Graph resumes from saved checkpoint, continues execution
 
 DEEP disconnect resilience: `asyncio.create_task()` keeps running after SSE drops. On reconnect, `GET /sessions/{id}` returns `run.status` and `artifact_id` if complete. Frontend fetches artifact independently.
@@ -445,7 +445,7 @@ Paper and web source manifests are appended at the end of every MDX document as 
 
 | Limitation | Impact | Mitigation |
 |-----------|--------|------------|
-| DEEP runs 10–20 min | User must wait or come back | SSE streams progress; hard 18-min cap → partial report |
+| DEEP runs 10–20 min | User must wait or come back | SSE streams progress; hard 18-min cap -> partial report |
 | 5 parallel researchers × 15 papers = up to 75 paper fetches | Slow under rate limits | Per-researcher time budget; S2 semaphore (1 req/sec) enforces pacing |
 | Synthesize prompt can be 20–40K tokens | Cost, latency | Truncate researcher findings proportionally if total > 40K tokens |
 | One DEEP run at a time system-wide | Can't run two DEEP sessions simultaneously | Redis lock; clear error message; upgrade services if needed |

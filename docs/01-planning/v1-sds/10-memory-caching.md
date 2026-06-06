@@ -16,7 +16,7 @@ Three distinct concerns, kept separate:
 
 ### What it is
 
-Instead of exact-match caching (same string → same response), semantic caching embeds the query and searches for a similar past query above a similarity threshold. If found, returns the cached response. 40–60% cost reduction expected on a research agent with repeated topic patterns.
+Instead of exact-match caching (same string -> same response), semantic caching embeds the query and searches for a similar past query above a similarity threshold. If found, returns the cached response. 40–60% cost reduction expected on a research agent with repeated topic patterns.
 
 ### Implementation — DIY with pgvector
 

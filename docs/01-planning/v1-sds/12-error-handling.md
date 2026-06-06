@@ -68,7 +68,7 @@ If a LangGraph node raises an unhandled exception:
 
 1. LangGraph's retry policy re-runs the node (configure `retry=RetryPolicy(max_attempts=2)` on nodes that call external APIs)
 2. If retry exhausted: exception propagates out of the graph runner
-3. Graph runner catches it → `runs.status = 'failed'`, logs full traceback with `run_id`
+3. Graph runner catches it -> `runs.status = 'failed'`, logs full traceback with `run_id`
 4. SSE stream receives: `{"type": "error", "code": "RUN_FAILED", "message": "..."}`
 5. Frontend renders error state + retry button
 

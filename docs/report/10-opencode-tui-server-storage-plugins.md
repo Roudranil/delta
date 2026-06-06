@@ -27,8 +27,8 @@ App (app.tsx)
 │   ├── SDKProvider (API client)
 │   ├── ThemeProvider
 │   └── Routes
-│       ├── /home → HomeScreen
-│       └── /session/:id → SessionScreen
+│       ├── /home -> HomeScreen
+│       └── /session/:id -> SessionScreen
 │           ├── Sidebar
 │           ├── MessageList
 │           └── Input + StatusBar
@@ -97,7 +97,7 @@ Share      - Session sharing
 ### Middleware Pipeline
 
 ```
-Authorization → CORS → Compression → Schema validation → Instance context routing → Handler
+Authorization -> CORS -> Compression -> Schema validation -> Instance context routing -> Handler
 ```
 
 ### WebSocket Management
@@ -296,7 +296,7 @@ Web App
 ├── GlobalSyncProvider (SSE subscription)
 ├── ModelsProvider (available models)
 └── Router
-    ├── /home → Session picker
+    ├── /home -> Session picker
     └── /session/:id
         ├── SessionView
         │   ├── MessageList

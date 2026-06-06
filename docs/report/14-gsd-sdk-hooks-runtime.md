@@ -80,20 +80,20 @@ class GSD {
   }
 
   // Execute a single plan file
-  executePlan(planPath, options?) → PlanResult {
+  executePlan(planPath, options?) -> PlanResult {
     success, costUsd, durationMs, tokenBreakdown
   }
 
-  // Run full phase lifecycle: discuss → research → plan → check → execute → verify → advance
-  runPhase(phaseNumber, options?: PhaseRunnerOptions) → PhaseRunnerResult {
+  // Run full phase lifecycle: discuss -> research -> plan -> check -> execute -> verify -> advance
+  runPhase(phaseNumber, options?: PhaseRunnerOptions) -> PhaseRunnerResult {
     phaseNumber, phaseName
     steps: PhaseStepResult[]    // per-step success/failure/cost/duration
     success, totalCostUsd, totalDurationMs
   }
 
   // Multi-phase milestone orchestration
-  run(prompt, options?: MilestoneRunnerOptions) → MilestoneRunnerResult
-    // Discovers phases → runs incomplete phases in order
+  run(prompt, options?: MilestoneRunnerOptions) -> MilestoneRunnerResult
+    // Discovers phases -> runs incomplete phases in order
     // Re-discovers after each completion (handles dynamically inserted phases)
     // Supports onPhaseComplete callback for stop/continue decisions
 }
@@ -115,9 +115,9 @@ class PhaseRunner {
   7. Advance    (mark complete, update roadmap)
 
   // Human gate callbacks (optional):
-  onDiscussApproval: (context) → 'approve' | 'reject' | 'modify'
-  onVerificationReview: (results) → 'accept' | 'reject' | 'retry'
-  onBlockerDecision: (blocker) → 'retry' | 'skip' | 'stop'
+  onDiscussApproval: (context) -> 'approve' | 'reject' | 'modify'
+  onVerificationReview: (results) -> 'accept' | 'reject' | 'retry'
+  onBlockerDecision: (blocker) -> 'retry' | 'skip' | 'stop'
 }
 ```
 
@@ -152,20 +152,20 @@ Single source of truth via manifest files:
 
 **API:**
 ```typescript
-loadConfig(cwd, workstream?) → MergedConfig
+loadConfig(cwd, workstream?) -> MergedConfig
   // Reads .planning/config.json (or workstream variant)
   // Merges with defaults
   // Never writes disk (pure read)
 
-normalizeLegacyKeys(parsed) → { parsed, normalizations[] }
+normalizeLegacyKeys(parsed) -> { parsed, normalizations[] }
   // Idempotent legacy key migration
   // Does NOT write disk
 
-mergeDefaults(parsed) → MergedConfig
+mergeDefaults(parsed) -> MergedConfig
   // Deep-merge: explicit null overrides defaults ("unset this key")
   // Arrays: replaced, not merged
 
-migrateOnDisk(cwd) → MigrationReport
+migrateOnDisk(cwd) -> MigrationReport
   // Explicit opt-in disk writeback
   // Applied normalizations + wrote path (or null if no changes)
 ```
@@ -219,7 +219,7 @@ migrateOnDisk(cwd) → MigrationReport
 class QueryRegistry {
   register(command: string, handler: QueryHandler)
   has(command: string): boolean
-  dispatch(command, args, projectDir) → QueryResult
+  dispatch(command, args, projectDir) -> QueryResult
   commands(): string[]
   extractField(obj, fieldPath): unknown  // supports a.b.c + items[0] notation
 }
@@ -266,8 +266,8 @@ The Runtime Bridge is the seam between the TypeScript SDK and the CJS tool runti
 
 ```typescript
 class QueryRuntimeBridge {
-  execute(input: RuntimeBridgeExecuteInput) → unknown
-    // Route: native QueryRegistry → subprocess gsd-tools.cjs
+  execute(input: RuntimeBridgeExecuteInput) -> unknown
+    // Route: native QueryRegistry -> subprocess gsd-tools.cjs
     // Emits RuntimeBridgeEvent { type, command, mode, dispatchMode, reason, outcome, errorKind }
 
   dispatchHotpath(legacyCmd, legacyArgs, registryCmd, registryArgs, mode)
@@ -296,7 +296,7 @@ interface RuntimeBridgeExecuteInput {
 For CJS callers that cannot use async/await:
 
 ```typescript
-executeForCjs(input: RuntimeBridgeExecuteInput) → RuntimeBridgeSyncResult
+executeForCjs(input: RuntimeBridgeExecuteInput) -> RuntimeBridgeSyncResult
   // Uses synckit (Atomics.wait + SharedArrayBuffer + worker_threads)
   // Spawns worker lazily, reuses across calls
   // CRITICAL: Must NOT be called from async context (deadlock)
@@ -353,7 +353,7 @@ interface WorkstreamInventory {
   progress_percent: number    // calculated: completed_plans / total_plans * 100
 }
 
-buildWorkstreamInventory(inputs: BuilderInputs) → WorkstreamInventory
+buildWorkstreamInventory(inputs: BuilderInputs) -> WorkstreamInventory
   // Stateless transformation: caller does I/O, builder does calculation
   // No filesystem access in builder (pure function)
 ```
@@ -361,10 +361,10 @@ buildWorkstreamInventory(inputs: BuilderInputs) → WorkstreamInventory
 ### 5.3 Security: Path Traversal Prevention (#3589)
 
 ```typescript
-validateWorkstreamName(name: string) → boolean
+validateWorkstreamName(name: string) -> boolean
   // Rejects '.', '..', path separators, non-ASCII
 
-relPlanningPath(projectDir, workstream?, file?) → string
+relPlanningPath(projectDir, workstream?, file?) -> string
   // Constructs path: .planning/ or .planning/workstreams/<name>/
   // Validates workstream name before constructing path
   // Used by ALL planning operations as single seam
@@ -389,7 +389,7 @@ class GSDEventStream extends EventEmitter {
 
 - Maps SDK messages to typed GSDEvents
 - Per-session cost tracking (CostBucket + CostTracker)
-- Single emit point → all listeners and transports see identical event sequence
+- Single emit point -> all listeners and transports see identical event sequence
 
 ### 6.2 Cost Tracking
 
@@ -402,7 +402,7 @@ interface CostBucket {
   costUsd: number
 }
 
-CostTracker.update(event) → CostUpdateEvent
+CostTracker.update(event) -> CostUpdateEvent
   // Cumulative totals per session
   // Emitted as CostUpdateEvent after each turn
 ```
@@ -414,11 +414,11 @@ CostTracker.update(event) → CostUpdateEvent
 ### 7.1 Hook Architecture
 
 Claude Code fires hooks as subprocess invocations:
-- **PreToolUse**: Before tool execution → can inject `additionalContext` advisory
-- **PostToolUse**: After tool completes → for observability/cleanup
+- **PreToolUse**: Before tool execution -> can inject `additionalContext` advisory
+- **PostToolUse**: After tool completes -> for observability/cleanup
 
 Contract:
-1. Claude Code detects tool call → emits event
+1. Claude Code detects tool call -> emits event
 2. Reads `.claude/hooks/` for matching executable scripts
 3. Passes JSON to hook's stdin
 4. Hook writes JSON to stdout (with optional `additionalContext`)
@@ -489,7 +489,7 @@ Goal: surface suspicious content before it enters agent context. Never blocks.
 
 ### 7.5 gsd-read-guard.js (PreToolUse)
 
-**Problem**: Non-Claude runtimes (MiniMax, OpenCode) don't enforce "read before edit" natively → model attempts Write/Edit on existing file without reading → runtime rejects → infinite retry loop.
+**Problem**: Non-Claude runtimes (MiniMax, OpenCode) don't enforce "read before edit" natively -> model attempts Write/Edit on existing file without reading -> runtime rejects -> infinite retry loop.
 
 **Solution**: Inject PreToolUse advisory BEFORE tool call reaches runtime.
 - Detects Claude Code (skips — CC enforces read-before-edit natively)
@@ -545,7 +545,7 @@ For Windows compatibility (#3597):
 Runtimes register hyphen-form command names (`/gsd-plan-phase`) but agent bodies reference colon form (`/gsd:plan-phase`). At install time for Claude/Qwen/Hermes:
 ```javascript
 transformContentToHyphen(agentBody, commandNames)
-  // Replaces /gsd:<cmd> → /gsd-<cmd> in agent definition
+  // Replaces /gsd:<cmd> -> /gsd-<cmd> in agent definition
   // Preserves colon refs for runtimes that self-convert
 ```
 
@@ -579,8 +579,8 @@ afterEach(async () => {
 - Unknown keys rejected
 
 **Workstream path traversal** (#3589):
-- `validateWorkstreamName('../../../outside')` → rejected
-- `relPlanningPath(projectDir, '../../../outside')` → throws
+- `validateWorkstreamName('../../../outside')` -> rejected
+- `relPlanningPath(projectDir, '../../../outside')` -> throws
 
 **Mutation event decorators**:
 - All mutation commands emit compatible event structures
@@ -610,7 +610,7 @@ Shared CJS/SDK helpers reduce drift via manifest files:
 - Planning path routing
 - Command definition registry
 
-**Consequence**: Schema/default changes must update manifest files → parity tests catch drift.
+**Consequence**: Schema/default changes must update manifest files -> parity tests catch drift.
 
 ### Transport Mode Abstraction
 
@@ -622,9 +622,9 @@ Shared CJS/SDK helpers reduce drift via manifest files:
 ### Hooks as Soft Guards (Core Philosophy)
 
 "Hooks advise, never block":
-- Prompt injection → Warning, not rejection
-- Read-before-edit → Guidance, not enforcement
-- Workflow guard → Advisory, not gate
+- Prompt injection -> Warning, not rejection
+- Read-before-edit -> Guidance, not enforcement
+- Workflow guard -> Advisory, not gate
 - Result: Zero false-positive deadlocks, preserved tool execution reliability
 
 ### Context Reduction Contract (#1614)

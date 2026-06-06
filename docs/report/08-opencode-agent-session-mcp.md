@@ -38,11 +38,11 @@ Defaults + config overrides + per-agent rules with explicit precedence (lines 10
 **Key Files**: `session/prompt.ts`, `session/processor.ts`, `session/llm.ts`
 
 **Flow**:
-1. User message → `MessageV2` with parts (text, files)
+1. User message -> `MessageV2` with parts (text, files)
 2. System prompt assembly (model-specific + agent override + instructions + max steps + mode reminders)
 3. LLM call via AI SDK: `streamObject()` with tools, model, temperature overrides
 4. Stream events (tool calls, text deltas, step finish)
-5. **Tool dispatch**: Check permissions → execute → capture output → feed back to LLM
+5. **Tool dispatch**: Check permissions -> execute -> capture output -> feed back to LLM
 6. Stop conditions: `end_turn`, permission denied, doom loop (3+ failures), token overflow, max iterations
 
 **Permission Check** (`processor.ts ~line 115-140`): Before each tool execution, call `permission.ask()` which evaluates ruleset. Returns `DeniedError`/`RejectedError`/`CorrectedError` on denial.
@@ -112,7 +112,7 @@ This is the key feature pi lacks entirely.
 
 ### Connection Flow (lines 296-445)
 
-1. `connectRemote()`: Parse URL → create OAuth provider if needed → try StreamableHTTP → fall back to SSE
+1. `connectRemote()`: Parse URL -> create OAuth provider if needed -> try StreamableHTTP -> fall back to SSE
 2. `connectLocal()`: Create StdioClientTransport with command, env, stderr logging
 3. Instantiate `Client` and call `client.connect(transport)`
 4. Call `listTools()` with error handling (retry with tolerant schema if outputSchema validation fails)
@@ -131,7 +131,7 @@ This is the key feature pi lacks entirely.
 ```typescript
 // listResources(): Available resources (context injection)
 // listPrompts(): Dynamic prompts that can be evaluated with args
-// getPrompt(name, args): Evaluate prompt → inject into system prompt
+// getPrompt(name, args): Evaluate prompt -> inject into system prompt
 // readResource(uri): Fetch resource content
 ```
 
@@ -151,9 +151,9 @@ This is the key feature pi lacks entirely.
 ### MCP Error Handling
 
 ```typescript
-// outputSchema validation error → retry with tolerant schema (omit outputSchema)
-// UnauthorizedError → status needs_auth + toast notification
-// Connection errors → retry fallback → final status "failed"
+// outputSchema validation error -> retry with tolerant schema (omit outputSchema)
+// UnauthorizedError -> status needs_auth + toast notification
+// Connection errors -> retry fallback -> final status "failed"
 // Cleanup: Kill subprocess descendants, close clients, clear pending OAuth transports
 ```
 
@@ -188,8 +188,8 @@ mcp:
 
 **Subscription Modes**:
 ```typescript
-subscribe<D>(eventDef) → Stream<Payload<D>>
-subscribeCallback<D>(def, callback) → Effect<() => void>
+subscribe<D>(eventDef) -> Stream<Payload<D>>
+subscribeCallback<D>(def, callback) -> Effect<() => void>
 subscribeAll()  // for all event types
 ```
 
@@ -239,7 +239,7 @@ cancel(CancelNotification)
 - Subscribe to `sdk.global.event()` stream
 - Handle events:
   - `permission.asked`: Request from client via `connection.requestPermission()`, handle reply
-  - `message.part.updated`: Send tool updates as they progress (pending → running → completed)
+  - `message.part.updated`: Send tool updates as they progress (pending -> running -> completed)
   - `message.part.delta`: Stream text and reasoning chunks
 
 ---
@@ -258,10 +258,10 @@ Ruleset = Rule[]
 ### Evaluation (lines 161-196)
 
 1. Check each pattern against rulesets
-2. If deny → fail with `DeniedError`
-3. If allow → continue
-4. If ask → publish `permission.asked` event, wait for user reply
-5. On "always" → add to approved rules (persisted)
+2. If deny -> fail with `DeniedError`
+3. If allow -> continue
+4. If ask -> publish `permission.asked` event, wait for user reply
+5. On "always" -> add to approved rules (persisted)
 
 ### Default Rules (agent.ts lines 103-122)
 
@@ -358,6 +358,6 @@ Parent agent's edit denies propagate to subagents (prevents privilege escalation
 2. **Permission system**: Wildcard/glob matching, ruleset merging with precedence, deferred approval via async events
 3. **Session persistence**: SQLite schema with cursor-based pagination
 4. **Two-tier event model**: In-memory bus + durable sync events + global bridge
-5. **Agent configuration**: Three-level merging (built-in → config → per-agent)
+5. **Agent configuration**: Three-level merging (built-in -> config -> per-agent)
 6. **ACP protocol**: Remote client control via JSON-RPC with bi-directional updates
 7. **Token tracking**: Separate counters for input/output/reasoning/cache with context-size-aware cost tiers

@@ -107,9 +107,9 @@ class ReportType(Enum):
 ```
 
 For Delta, the relevant types are:
-- `ResearchReport` → standard literature survey
-- `DeepResearch` → comprehensive review (expensive)
-- `ReportFromSources` → if the user uploads PDFs directly
+- `ResearchReport` -> standard literature survey
+- `DeepResearch` -> comprehensive review (expensive)
+- `ReportFromSources` -> if the user uploads PDFs directly
 
 ---
 
@@ -155,7 +155,7 @@ class ContextManager:
 
 Key: when writing a multi-section report, each section writer gets only the previously written sections that are similar to the current one — not all sections. This prevents context bloat in long reports.
 
-**For Delta:** When writing a literature review with multiple sections (Background → Current State → Open Problems → Recommendations), pass only relevant prior sections to each new section's prompt.
+**For Delta:** When writing a literature review with multiple sections (Background -> Current State -> Open Problems -> Recommendations), pass only relevant prior sections to each new section's prompt.
 
 ---
 

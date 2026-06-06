@@ -36,7 +36,7 @@ Things not yet accounted for in the current plan. Roughly ordered by how badly t
 - Session metadata + messages: ~50 MB for heavy use
 - **Total: ~140 MB comfortably within 0.5 GB for 6 months**
 
-**Risk:** If you store full paper chunks as text in Postgres (for FTS alongside vector search), the storage explodes. A 10-page paper → ~20 chunks × ~500 tokens × ~3 bytes = ~30 KB per paper. 10K papers = ~300 MB just in chunk text.
+**Risk:** If you store full paper chunks as text in Postgres (for FTS alongside vector search), the storage explodes. A 10-page paper -> ~20 chunks × ~500 tokens × ~3 bytes = ~30 KB per paper. 10K papers = ~300 MB just in chunk text.
 
 **Decision:** Store chunk text in R2 (as part of the JSONL session file or a separate paper cache file), not in Neon. Neon stores only embeddings + metadata. This keeps Neon within the 0.5 GB limit even at scale.
 
@@ -151,7 +151,7 @@ r2 = boto3.client(
     region_name="auto",
 )
 
-# Append to a JSONL file in R2: read → append → write (R2 has no append operation)
+# Append to a JSONL file in R2: read -> append -> write (R2 has no append operation)
 # For true append-only, write each message as a separate object with a sequential key:
 # sessions/{session_id}/{timestamp}_{message_id}.json
 # Then list + sort to reconstruct the session thread

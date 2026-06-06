@@ -53,7 +53,7 @@ export interface AgentToolResult<T> {
 - **`"sequential"`**: One tool at a time; next doesn't start until previous is finalized
 - **`"parallel"`**: All tools prepared sequentially, then allowed tools execute concurrently; results emitted in completion order
 
-### Request → Call → Result Cycle
+### Request -> Call -> Result Cycle
 
 ```
 1. beforeToolCall hook
@@ -131,8 +131,8 @@ export async function loadSkills(
 ```
 
 **Discovery Rules:**
-- If dir contains `SKILL.md` → treat as skill root, don't recurse
-- Otherwise → load `.md` files from root directory
+- If dir contains `SKILL.md` -> treat as skill root, don't recurse
+- Otherwise -> load `.md` files from root directory
 - Recurse into subdirectories to find `SKILL.md` files
 
 ### Skill Injection into System Prompt
@@ -320,7 +320,7 @@ PI_PACKAGE_DIR                       # Override package asset dir
 
 **`settings.json`**: User-selected settings — preferred model, thinking level, active tool set, shell path, theme selection, custom keybindings.
 
-### Resource Loading Precedence (Highest → Lowest)
+### Resource Loading Precedence (Highest -> Lowest)
 
 1. CLI flags and environment variables
 2. `settings.json` (user selections)

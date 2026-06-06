@@ -30,11 +30,11 @@ The system has five distinct inference tasks with different quality/cost tradeof
 **Why:** Best open multilingual embedding model, excellent retrieval quality, handles physics terminology, extremely cheap.
 
 **Important schema implication:** All `vector()` columns in Neon use dimension 1024:
-- `paper_chunks.content_embedding` → `vector(1024)`
-- `paper_chunks.specter_embedding` → `vector(768)` (from S2, unchanged)
-- `document_chunks.content_embedding` → `vector(1024)`
-- `user_documents.content_embedding` → `vector(1024)`
-- `semantic_cache.query_embedding` → `vector(1024)`
+- `paper_chunks.content_embedding` -> `vector(1024)`
+- `paper_chunks.specter_embedding` -> `vector(768)` (from S2, unchanged)
+- `document_chunks.content_embedding` -> `vector(1024)`
+- `user_documents.content_embedding` -> `vector(1024)`
+- `semantic_cache.query_embedding` -> `vector(1024)`
 
 ---
 

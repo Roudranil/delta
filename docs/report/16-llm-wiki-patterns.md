@@ -20,8 +20,8 @@ Three layers:
   purpose.md       — why this wiki exists (LLM reads this for context)
 
 Three operations:
-  Ingest   — read source → analyze → write wiki pages
-  Query    — semantic search + graph expansion → LLM answer with citations
+  Ingest   — read source -> analyze -> write wiki pages
+  Query    — semantic search + graph expansion -> LLM answer with citations
   Lint     — detect dead wikilinks, orphaned pages, stale content
 ```
 
@@ -58,7 +58,7 @@ For Delta: every claim in the research output should link back to the paper it c
 
 ## 3. Two-Step Chain-of-Thought Ingest
 
-Open Notebook and similar tools do single-step ingest (read → write). LLM Wiki splits it:
+Open Notebook and similar tools do single-step ingest (read -> write). LLM Wiki splits it:
 
 **Step 1 — Analysis LLM call:**
 ```
@@ -128,12 +128,12 @@ Phase 2: Graph Expansion
   - 2-hop traversal with decay
 
 Phase 3: Budget Control
-  - configurable context window: 4K → 1M tokens
+  - configurable context window: 4K -> 1M tokens
   - 60% wiki pages / 20% chat history / 5% index / 15% system
   - pages prioritized by combined relevance score
 ```
 
-For Delta: this retrieval pipeline structure (search → expand → budget-limit → assemble) is a clean blueprint for deciding what to include in the LLM's context window during research synthesis.
+For Delta: this retrieval pipeline structure (search -> expand -> budget-limit -> assemble) is a clean blueprint for deciding what to include in the LLM's context window during research synthesis.
 
 ---
 
@@ -157,7 +157,7 @@ Also used in LLM Wiki for:
 - Skipping unchanged wiki pages during lint
 - Skipping already-embedded pages during vector indexing
 
-**For Delta:** If a paper was already fetched and summarized in a previous session, cache it. Don't re-fetch and re-summarize. Key: `(paper_id, model_version)` → cached summary.
+**For Delta:** If a paper was already fetched and summarized in a previous session, cache it. Don't re-fetch and re-summarize. Key: `(paper_id, model_version)` -> cached summary.
 
 ---
 
@@ -188,7 +188,7 @@ When knowledge gaps are found:
 1. LLM generates domain-aware search queries (reads `purpose.md` + `overview.md` for context)
 2. User sees confirmation dialog with editable queries before search starts
 3. Web search via Tavily / SerpApi / SearXNG
-4. LLM synthesizes findings → wiki research page with cross-references
+4. LLM synthesizes findings -> wiki research page with cross-references
 5. Auto-ingest into knowledge base
 
 **For Delta:** The "confirm before searching" pattern is good UX. Before launching a full research run, show the user the search plan and let her edit it. Especially important for a non-technical user who may have a very specific context the LLM doesn't know about.
@@ -213,7 +213,7 @@ When knowledge gaps are found:
 
 | Feature | Where to apply in Delta |
 |---------|------------------------|
-| Two-step ingest (analyze then generate) | Research synthesis: analyze papers → write report |
+| Two-step ingest (analyze then generate) | Research synthesis: analyze papers -> write report |
 | `sources[]` traceability in every output | Every claim links to its paper ID |
 | SHA256 incremental cache | Cache paper summaries across sessions |
 | Budget-controlled context assembly | Limit what goes into final synthesis prompt |
@@ -237,8 +237,8 @@ When knowledge gaps are found:
 
 ## 12. The Fundamental Tradeoff: Wiki vs. Fresh Research
 
-LLM Wiki compiles knowledge incrementally → cheap queries, stale if sources not updated.
-Delta (and GPT Researcher/Open Deep Research) runs fresh research → expensive, always current.
+LLM Wiki compiles knowledge incrementally -> cheap queries, stale if sources not updated.
+Delta (and GPT Researcher/Open Deep Research) runs fresh research -> expensive, always current.
 
 For experimental physics paper discovery, **fresh research is correct**. Her field moves fast. A 6-month-old wiki entry about thin film deposition techniques would miss recent Physical Review Letters. Delta's approach is right.
 

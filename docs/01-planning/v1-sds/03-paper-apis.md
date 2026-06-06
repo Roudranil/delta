@@ -86,7 +86,7 @@ STEP 2 — Semantic Scholar
   Input:  query | doi ("DOI:10.xxx") | arxiv_id ("ARXIV:2301.xxx") | s2_id
   Action: GET /paper/search or GET /paper/{id}
   Gets:   metadata, abstract, openAccessPdf.url, specter embedding, citation count
-  On hit: populate PaperResult metadata fields; if openAccessPdf.url present → jump to STEP 6
+  On hit: populate PaperResult metadata fields; if openAccessPdf.url present -> jump to STEP 6
   On miss or no PDF: continue to STEP 3
 
   STEP 2b — Citation snowballing (runs after initial search, not per-paper)
@@ -96,9 +96,9 @@ STEP 2 — Semantic Scholar
   
   For each seed paper:
     backward = GET /paper/{s2_id}/references?fields=paperId,title,citationCount,embedding&limit=50
-               → finds foundational older work this paper builds on
+               -> finds foundational older work this paper builds on
     forward  = GET /paper/{s2_id}/citations?fields=paperId,title,citationCount,embedding&limit=50
-               → finds newer papers that built on this one (especially useful for recency)
+               -> finds newer papers that built on this one (especially useful for recency)
 
   Filtering before fetching (cheap — uses embeddings, no LLM):
     - skip if paper_id in visited_paper_ids (dedup)
@@ -110,14 +110,14 @@ STEP 2 — Semantic Scholar
   Budget: max 20 new papers per research run from snowballing
   Depth:  1 only — never recurse into citations-of-citations (explosion risk)
 
-  Top candidates by score → each runs through fetch_paper() waterfall (steps 3–8)
+  Top candidates by score -> each runs through fetch_paper() waterfall (steps 3–8)
   All discovered papers added to visited_paper_ids immediately
 
 STEP 3 — OpenAlex
   Input:  doi (/works/https://doi.org/{doi}) | query (/works?search=)
   Action: GET /works/{doi} or GET /works?search=QUERY&filter=has_abstract:true
   Gets:   metadata, abstract (reconstructed from inverted index), best_oa_location.pdf_url
-  On hit: fill any missing metadata fields; if pdf_url present → jump to STEP 6
+  On hit: fill any missing metadata fields; if pdf_url present -> jump to STEP 6
   On miss or no PDF: continue to STEP 4
 
 STEP 4 — Unpaywall (DOI required)
@@ -131,7 +131,7 @@ STEP 5 — arXiv (preprints)
   Input:  arxiv_id | query with category filter
   Action: GET /api/query?id_list={arxiv_id} or search_query=...
   Gets:   abstract, direct PDF URL (always available for arXiv papers)
-  On hit: PDF URL always present → jump to STEP 6
+  On hit: PDF URL always present -> jump to STEP 6
   On miss: continue to STEP 7 (CORE)
 
 STEP 6 — Structured/clean text extraction (prefer parseable formats over PDF)
@@ -139,7 +139,7 @@ STEP 6 — Structured/clean text extraction (prefer parseable formats over PDF)
 
   6a. arXiv HTML (arXiv papers only)
       URL: https://arxiv.org/html/{arxiv_id}
-      Action: httpx GET → BeautifulSoup strip tags → clean text
+      Action: httpx GET -> BeautifulSoup strip tags -> clean text
       Why: arXiv renders most papers to semantic HTML (ar5iv integration).
            Column-aware, equation-aware, no PDF parsing needed.
            Returns clean prose. Fast (~200ms). Always try this before PDF.
@@ -155,15 +155,15 @@ STEP 6 — Structured/clean text extraction (prefer parseable formats over PDF)
 
   6c. PDF via pymupdf (last resort)
       Input:  pdf_url from steps 2–5
-      Action: httpx GET pdf_url → bytes → fitz.open() → extract text per page
-      Quality check: if words_per_page < 100 → text is garbage (column merge failure)
+      Action: httpx GET pdf_url -> bytes -> fitz.open() -> extract text per page
+      Quality check: if words_per_page < 100 -> text is garbage (column merge failure)
                      set abstract_only=True, stop — do NOT attempt further parsing
       On good quality: continue to STEP 8
       On bad quality or fetch failure (403, timeout): abstract_only=True, stop waterfall
 
 STEP 8 — Chunking + Embedding (triggered when full text available)
   Input:  raw full text string
-  Action: chunk → embed → store
+  Action: chunk -> embed -> store
   See "PDF Processing Pipeline" section below
 
 STEP 9 — Crossref (metadata enrichment only, runs in parallel with steps 2-5)
@@ -235,7 +235,7 @@ embed_chunks()
     │
     ▼
 mean_pool_embedding()
-    - average all chunk embeddings → single document embedding (1536 dims)
+    - average all chunk embeddings -> single document embedding (1536 dims)
     - store as content_embedding on papers table
     │
     ▼
@@ -300,7 +300,7 @@ async def extract_full_text(
         except Exception:
             pass
 
-    # All formats failed → abstract only
+    # All formats failed -> abstract only
     return None, None
 ```
 

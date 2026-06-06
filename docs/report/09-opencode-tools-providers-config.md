@@ -108,7 +108,7 @@ interface Context {
 
 **WEBFETCH** — URL fetch with markdown conversion
 - Parameters: `url` (https://), `format?` (`"text"|"markdown"|"html"`), `timeout?` (max 120s)
-- HTML → Markdown (TurndownService)
+- HTML -> Markdown (TurndownService)
 - Image fetching as base64 data URL
 - Content-Length limit: 5MB
 - Cloudflare challenge retry with fallback UA
@@ -388,7 +388,7 @@ skills:
 snapshot: true
 ```
 
-### Config Loading Precedence (highest → lowest)
+### Config Loading Precedence (highest -> lowest)
 
 1. Environment variables (`OPENCODE_MODEL`, etc.)
 2. Auth service (stored credentials)

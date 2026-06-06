@@ -36,7 +36,7 @@ Two buttons. No slash commands in v1.
 - **Behaviour:** Delta generates a research brief, fans out to parallel sub-searches, retrieves and reads full text where available, synthesizes across papers. Streams output as it builds.
 - **Time budget:** 2–5 minutes, with visible progress
 - **Output:**
-    - Structured report: Background → Current State → Methods / Findings → Open Questions → Recommendations
+    - Structured report: Background -> Current State -> Methods / Findings -> Open Questions -> Recommendations
     - Main paper list: 5 curated papers with per-paper synthesis paragraph
     - Appendix paper list: up to 20 additional relevant papers, title + one-line note
     - All citations link to publisher page and open-access PDF where available
@@ -155,7 +155,7 @@ clarify_or_plan       [LLM] decide: ask clarifying question OR generate research
               │
               │  Send × N
               ▼
-            search_subtopic   [deterministic + LLM] search APIs → fetch full text → extract relevant chunks
+            search_subtopic   [deterministic + LLM] search APIs -> fetch full text -> extract relevant chunks
               │  (parallel, each is independent)
               │
               ▼
@@ -212,7 +212,7 @@ semantic_scholar_citations(paper_id: str) -> list[PaperResult]   # forward citat
 openalex_search(query: str, filters: dict) -> list[PaperResult]
 
 # Full text access (waterfall, tried in order)
-fetch_full_text(doi: str) -> FullTextResult   # tries Unpaywall → CORE → arXiv internally
+fetch_full_text(doi: str) -> FullTextResult   # tries Unpaywall -> CORE -> arXiv internally
 
 # Session / memory
 list_sessions(user_id: str, query: Optional[str]) -> list[SessionSummary]
@@ -251,7 +251,7 @@ get_session_summary(session_id: str) -> str
 - Session storage, memory file I/O
 - Retry logic on API failures
 
-**The invariant:** Every paper cited in Delta's output exists in `raw_results` for that session. The LLM can only reference papers by their `paper_id`. Code resolves paper_id → full citation. If the LLM invents a paper_id that doesn't exist in the session's retrieved set, it is silently dropped.
+**The invariant:** Every paper cited in Delta's output exists in `raw_results` for that session. The LLM can only reference papers by their `paper_id`. Code resolves paper_id -> full citation. If the LLM invents a paper_id that doesn't exist in the session's retrieved set, it is silently dropped.
 
 ## 9. API Layer
 
@@ -319,7 +319,7 @@ Hosted web app. React (Vite). No local setup, no install. She opens a URL.
 ## 12. Build Order
 
 1. `tools/semantic_scholar.py` — search, paper details, forward citations
-2. `tools/full_text.py` — Unpaywall → CORE → arXiv waterfall, PDF extraction
+2. `tools/full_text.py` — Unpaywall -> CORE -> arXiv waterfall, PDF extraction
 3. `tools/openalex.py` — supplementary search
 4. `graphs/research.py` — the LangGraph graph (state, nodes, edges)
 5. `graphs/memory.py` — memory read/write nodes

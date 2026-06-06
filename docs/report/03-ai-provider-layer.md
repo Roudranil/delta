@@ -83,7 +83,7 @@ All errors are **encoded in the stream, never thrown**. Even on error, you recei
 
 ### API Provider Registry (`api-registry.ts`)
 
-Pi's registry maps **one Api type → one provider implementation**:
+Pi's registry maps **one Api type -> one provider implementation**:
 
 ```typescript
 interface ApiProvider<TApi extends Api, TOptions extends StreamOptions> {
@@ -98,7 +98,7 @@ getApiProvider("anthropic-messages")  // Returns the provider
 
 ### Model Registry (`models.ts`)
 
-Models are organized: Provider → ModelId → Model<Api>
+Models are organized: Provider -> ModelId -> Model<Api>
 
 ```typescript
 getModel("anthropic", "claude-opus-4-1")  // Returns Model<"anthropic-messages">
@@ -180,10 +180,10 @@ Features:
 
 Stop reason mapping:
 ```
-"end_turn" → "stop"
-"max_tokens" → "length"
-"tool_use" → "toolUse"
-"refusal" / "sensitive" → "error"
+"end_turn" -> "stop"
+"max_tokens" -> "length"
+"tool_use" -> "toolUse"
+"refusal" / "sensitive" -> "error"
 ```
 
 Custom SSE parser handles CRLF, CR, LF line endings, multi-line data values.
@@ -275,7 +275,7 @@ If `model.input` doesn't include `"image"`, replace image blocks with placeholde
 
 - Anthropic: `^[a-zA-Z0-9_-]+$` max 64 chars
 - Mistral: 9 chars
-- OpenAI Responses: 450+ chars with `|` characters → hash-based shortening
+- OpenAI Responses: 450+ chars with `|` characters -> hash-based shortening
 
 #### Synthetic Tool Results for Orphaned Calls
 
@@ -446,7 +446,7 @@ Always returns valid object — ensures streaming JSON assembly never crashes ev
 2. **Content block types**: `TextContent`, `ThinkingContent`, `ImageContent`, `ToolCall`
 3. **Async streaming**: `async def` generators matching event protocol
 4. **Provider registry**: Dict-based with lazy loading
-5. **TypeBox → pydantic**: Use pydantic for JSON schema generation + validation
+5. **TypeBox -> pydantic**: Use pydantic for JSON schema generation + validation
 6. **SSE parsing**: Line-by-line parser for Anthropic event stream
 7. **Model registry**: JSON-based catalog
 8. **Stop reason mapping**: Per-provider mappers to canonical `StopReason` enum

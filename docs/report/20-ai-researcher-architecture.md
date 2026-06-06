@@ -6,7 +6,7 @@ Source: `reference-repos/AI-Researcher`
 
 ## Executive Summary
 
-AI-Researcher (HKUDS, NeurIPS 2025 Spotlight) is a system for end-to-end autonomous scientific research: literature review → idea generation → algorithm design → code implementation → experimentation → paper writing. It uses Docker-containerized execution environments, the `MetaChain` agent loop (LiteLLM-based), and a multi-agent pipeline orchestrated by a global state machine. It is the most ambitious reference repo but the least applicable to Delta — it automates paper *writing*, not paper *discovery*. However, MetaChain and the fn-call conversion layer are directly useful.
+AI-Researcher (HKUDS, NeurIPS 2025 Spotlight) is a system for end-to-end autonomous scientific research: literature review -> idea generation -> algorithm design -> code implementation -> experimentation -> paper writing. It uses Docker-containerized execution environments, the `MetaChain` agent loop (LiteLLM-based), and a multi-agent pipeline orchestrated by a global state machine. It is the most ambitious reference repo but the least applicable to Delta — it automates paper *writing*, not paper *discovery*. However, MetaChain and the fn-call conversion layer are directly useful.
 
 ---
 
@@ -110,11 +110,11 @@ def convert_tools_to_description(tools: list) -> str:
 
 def convert_fn_messages_to_non_fn_messages(messages: list) -> list:
     """Convert tool_call messages to plain text format for non-fn-call models."""
-    # ToolCall messages → "I called X(args) and got: result"
+    # ToolCall messages -> "I called X(args) and got: result"
 
 def convert_non_fncall_messages_to_fncall_messages(messages: list, tools: list) -> list:
     """Parse text tool calls from non-fn-call model output back into ToolCall format."""
-    # Reverse: model's text output → ToolCall objects
+    # Reverse: model's text output -> ToolCall objects
 ```
 
 **Why this matters for Delta:** DeepSeek v3 via LiteLLM supports function calling natively. But if you ever switch to a cheaper model that doesn't (e.g., some smaller models), this converter layer lets you maintain the same tool interface. LiteLLM actually handles most of this automatically, but understanding the pattern is useful.
@@ -139,7 +139,7 @@ def transfer_to_writer_agent() -> Agent:
     return WriterAgent()
 ```
 
-When a tool function returns an `Agent` object instead of a string, MetaChain switches the active agent. This is how AI-Researcher hands off from ResearchAgent → WriterAgent → ReviewAgent.
+When a tool function returns an `Agent` object instead of a string, MetaChain switches the active agent. This is how AI-Researcher hands off from ResearchAgent -> WriterAgent -> ReviewAgent.
 
 **For Delta:** LangGraph's `Command(goto=...)` and conditional edges are cleaner than this handoff pattern. Don't copy the Agent dataclass pattern.
 
@@ -173,34 +173,34 @@ def run_experiment(experiment_name: str, context_variables: dict) -> Result:
 ### Level 1: Implement a given idea
 ```
 run_infer_plan.py
-  → Literature Review Agent: fetch and analyze reference papers
-  → Design Agent: plan algorithm architecture
-  → Implementation Agent: write code in Docker container
-  → Experiment Agent: run experiments, collect metrics
-  → Analysis Agent: interpret results
-  → Refinement Agent: fix bugs, improve performance
+  -> Literature Review Agent: fetch and analyze reference papers
+  -> Design Agent: plan algorithm architecture
+  -> Implementation Agent: write code in Docker container
+  -> Experiment Agent: run experiments, collect metrics
+  -> Analysis Agent: interpret results
+  -> Refinement Agent: fix bugs, improve performance
 ```
 
 ### Level 2: Generate idea then implement
 ```
 run_infer_idea.py
-  → Same as Level 1 but with:
-  → Idea Generation Agent: given papers, propose novel approach
+  -> Same as Level 1 but with:
+  -> Idea Generation Agent: given papers, propose novel approach
 ```
 
 ### Paper Writing (separate pipeline)
 ```
 paper_agent/writing.py
-  → Abstract Agent: write abstract from results
-  → Introduction Agent: write intro from background
-  → Related Work Agent: write related work section
-  → Methodology Agent: write method description
-  → Experiments Agent: write experiments section
-  → Conclusion Agent: write conclusion
-  → LaTeX compilation and PDF generation
+  -> Abstract Agent: write abstract from results
+  -> Introduction Agent: write intro from background
+  -> Related Work Agent: write related work section
+  -> Methodology Agent: write method description
+  -> Experiments Agent: write experiments section
+  -> Conclusion Agent: write conclusion
+  -> LaTeX compilation and PDF generation
 ```
 
-**For Delta:** The paper writing pipeline's section-by-section approach is worth noting. When Delta generates a literature review, break it into sections and write each separately: Background → Current Work → Methods Comparison → Open Problems → Recommendations. Each section gets its own prompt with the relevant paper subset.
+**For Delta:** The paper writing pipeline's section-by-section approach is worth noting. When Delta generates a literature review, break it into sections and write each separately: Background -> Current Work -> Methods Comparison -> Open Problems -> Recommendations. Each section gets its own prompt with the relevant paper subset.
 
 ---
 

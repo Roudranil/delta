@@ -6,7 +6,7 @@ Source: `reference-repos/open-notebook`
 
 ## Executive Summary
 
-Open Notebook is an open-source NotebookLM clone built with FastAPI + LangGraph + SurrealDB. It processes multi-modal content (PDFs, URLs, audio, video), generates AI-powered notes and insights, supports semantic search via vector embeddings, and produces podcast-style audio summaries. The architecture is three-tier: Next.js frontend → FastAPI backend → SurrealDB graph database. The LangGraph workflows are thin, clean, and directly copyable for Delta's source ingestion and chat patterns.
+Open Notebook is an open-source NotebookLM clone built with FastAPI + LangGraph + SurrealDB. It processes multi-modal content (PDFs, URLs, audio, video), generates AI-powered notes and insights, supports semantic search via vector embeddings, and produces podcast-style audio summaries. The architecture is three-tier: Next.js frontend -> FastAPI backend -> SurrealDB graph database. The LangGraph workflows are thin, clean, and directly copyable for Delta's source ingestion and chat patterns.
 
 ---
 
@@ -20,7 +20,7 @@ API (FastAPI)                        port 5055
   LangGraph orchestration, async job queue
          │ SurrealQL
 Database (SurrealDB)                 port 8000
-  Graph model: Notebook → Source → Note → ChatSession
+  Graph model: Notebook -> Source -> Note -> ChatSession
   Vector embeddings for semantic search
 ```
 
@@ -87,7 +87,7 @@ graph = agent_state.compile(checkpointer=SqliteSaver(conn))
 **Key patterns:**
 - `SqliteSaver` for persistence: `conn = sqlite3.connect(CHECKPOINT_FILE, check_same_thread=False)`
 - `clean_thinking_content()` strips `<think>...</think>` tags from DeepSeek/extended-thinking models
-- Async/sync bridging: LangGraph nodes are sync but `provision_langchain_model()` is async → `ThreadPoolExecutor` workaround
+- Async/sync bridging: LangGraph nodes are sync but `provision_langchain_model()` is async -> `ThreadPoolExecutor` workaround
 
 **Directly applicable to Delta:** This is almost exactly what Delta needs for chat. Copy the `ThreadState` + `SqliteSaver` pattern.
 
@@ -102,7 +102,7 @@ class SourceState(TypedDict):
     transformation: Annotated[list, operator.add]  # accumulates results
     embed: bool
 
-# Graph: content_process → save_source → [transform_content × N] (parallel fan-out)
+# Graph: content_process -> save_source -> [transform_content × N] (parallel fan-out)
 workflow.add_conditional_edges(
     "save_source", trigger_transformations, ["transform_content"]
 )
@@ -122,7 +122,7 @@ This `Send` fan-out pattern is directly applicable to Delta when running paralle
 ### 3.3 `ask.py` — Search + synthesis
 
 ```python
-# Generates multiple search terms → parallel vector searches → LLM synthesis
+# Generates multiple search terms -> parallel vector searches -> LLM synthesis
 # Not deeply useful for Delta since we have external search APIs, not a local vector store
 ```
 
@@ -134,7 +134,7 @@ class TransformationState(TypedDict):
     transformation: Transformation
     output: str
 
-# One node: call LLM with prompt template → return output
+# One node: call LLM with prompt template -> return output
 # Uses ai_prompter.Prompter for Jinja2 template rendering
 ```
 
@@ -159,7 +159,7 @@ async def provision_langchain_model(
     # 3. Return LangChain ChatModel with provider-specific config
 ```
 
-Open Notebook uses the `Esperanto` library (8+ providers: OpenAI, Anthropic, Google, Groq, Ollama, Mistral, DeepSeek, xAI). Delta uses LiteLLM for the same purpose. The abstraction shape is similar — model ID → provider → credentials → LangChain compatible object.
+Open Notebook uses the `Esperanto` library (8+ providers: OpenAI, Anthropic, Google, Groq, Ollama, Mistral, DeepSeek, xAI). Delta uses LiteLLM for the same purpose. The abstraction shape is similar — model ID -> provider -> credentials -> LangChain compatible object.
 
 ### 4.2 Error classification
 
@@ -228,7 +228,7 @@ For Delta: `content-core` is worth considering for PDF/URL extraction instead of
 ## 7. Database: SurrealDB vs SQLite
 
 Open Notebook chose SurrealDB for:
-- Built-in graph relationships (Notebook → Source → Note)
+- Built-in graph relationships (Notebook -> Source -> Note)
 - Built-in vector search (ANN index on embeddings)
 - Schema migrations via SurrealQL
 
