@@ -16,10 +16,5 @@ dist/
 # OS
 .DS_Store
 
-# Environment (secrets — do not commit)
-.env.dev
-.env.prod
-.env.local
-
 # Project
 reference-repos/

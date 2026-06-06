@@ -1,3 +1,14 @@
 {
-    "python.analysis.typeCheckingMode": "basic"
+    "python.analysis.typeCheckingMode": "basic",
+    // need to stop github copilot chat from being able to read my .env files
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/.dart_tool": true,
+        "**/.env": true,
+        "**/.env.local": true,
+        "**/.env.prod": true,
+        "**/.env.dev": true
+    }
 }
