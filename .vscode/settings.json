@@ -1,5 +1,5 @@
 {
-    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.typeCheckingMode": "off",
     // need to stop github copilot chat from being able to read my .env files
     "search.exclude": {
         "**/node_modules": true,
