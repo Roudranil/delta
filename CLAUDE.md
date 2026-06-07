@@ -2,8 +2,6 @@
 
 Delta is a personal research agent for literature survey, paper discovery, and synthesis. Two real users: a Physics PhD student (primary) and her boyfriend (developer). Not a product — build for them.
 
----
-
 ## What it does
 
 Two modes, both in the same session-based interface:
@@ -13,14 +11,23 @@ Two modes, both in the same session-based interface:
 
 A session has a fixed mode. After a DEEP run completes, follow-up questions run as EXPLORE automatically.
 
----
+## Design philosophy
+
+These principles resolve ambiguous decisions without debate.
+
+- **Minimal by default.** Write the least code that works. No abstractions until there are 3+ concrete cases. If it can be a constant, it's a constant.
+- **Deterministic over LLM wherever possible.** Mode selection, dedup, citation assembly, API calls, chunking, ranking — all deterministic. The LLM decides what to search for and what to say. Code decides everything else.
+- **Fail visibly, not silently.** A paper not found is flagged `abstract_only`. A broken SSE stream shows an error state, not a spinner forever. She should never wonder if something is working.
+- **Everything is logged.** Every node entry/exit, every external API call, every LLM call with token counts, every cache hit and miss. Logs are structured JSON with `user_id`, `session_id`, `run_id` always present.
+- **The user never waits for non-critical work.** Title generation, memory updates, summary bullets — run after the response is sent, never on the critical path.
+- **Every citation is real.** The LLM references papers by `paper_id` only. Code resolves to full citation. If the ID doesn't exist in the retrieved set, it's dropped. No hallucinated citations.
 
 ## Stack
 
 **Backend** (`server/`) — Python, deployed to Render
 - FastAPI + uvicorn — HTTP + SSE
 - LangGraph — agent graphs (`AsyncPostgresSaver` checkpointer)
-- LiteLLM via `langchain_litellm.ChatLiteLLM` — model gateway with fallback chains
+- LiteLLM via `langchain_litellm.ChatLiteLLMRouter` — model router with weighted failover
 - Neon (Postgres + pgvector) — all persistent state
 - Upstash Redis — session locks, visited-papers set (2 keys per run)
 - Cloudflare R2 — raw PDFs, JSONL archives, MDX artifacts
@@ -31,114 +38,83 @@ A session has a fixed mode. After a DEEP run completes, follow-up questions run 
 
 **Frontend** (`web/`) — React + Vite + TypeScript, deployed to Cloudflare Pages
 
----
-
 ## Folder layout
 
 ```
-server/app/
-  api/          # HTTP layer only — validates, calls graph or db, returns
-  graphs/       # LangGraph graph definitions + nodes/
-  tools/        # What the graph calls — orchestrates sources, caching, fallbacks
-  sources/      # Thin API clients (S2, OpenAlex, arXiv, Exa, Tavily)
-  extract/      # PDF/HTML -> clean text -> chunks -> embeddings
-  db/           # All Postgres/Redis/R2 clients live here (migrations/ inside)
-  models/       # Pydantic: domain models, API contracts, LLM output schemas
-  lib/          # llm.py (single LLM entry), cache.py, memory.py, logging setup
+server/
+├── src/delta/
+│   ├── main.py           # entry point — bootstraps config; no HTTP server yet
+│   ├── app/
+│   │   ├── config.py     # Pydantic settings for all env vars (AppSettings, LLMSettings, etc.)
+│   │   ├── db/           # all Postgres/Redis/R2 clients — nothing outside here imports storage
+│   │   └── tracing/      # logging setup (Loguru, structured JSON)
+│   ├── llm/
+│   │   ├── models.py     # single source of truth for model variants, deployments, tier groups
+│   │   ├── providers.py  # provider credentials and env-var loading (Nebius today)
+│   │   └── runtime.py    # get_model(tier) — process-level singleton router, never call LiteLLM directly
+│   ├── schemas/
+│   │   └── llm.py        # Pydantic schemas for ModelVariant, ModelDeployment, ModelTier
+│   ├── api/              # HTTP layer only — validates, calls graph or db, returns. No business logic.
+│   ├── graphs/           # LangGraph graph definitions + nodes/ (one async function per node)
+│   └── tools/            # graph-facing tools — orchestrates sources, caching, fallbacks
+└── tests/
+    ├── unit/             # fast, no network, no DB
+    └── integration/      # hits real APIs — run manually, not in CI
 
-web/src/
-  pages/        # Route components (no direct API calls)
-  components/   # Stateless UI components
-  hooks/        # All API interactions (useSession, useStream, etc.)
-  api/          # Typed fetch wrappers — called only by hooks/
-  store/        # Zustand — minimal client state
-  types/        # Mirrors backend Pydantic models
+web/
+└── src/
+    ├── pages/            # route components — no direct API calls, uses hooks/
+    ├── components/       # stateless UI components
+    ├── hooks/            # all API interactions (useSession, useStream, etc.)
+    ├── api/              # typed fetch wrappers — called only by hooks/
+    ├── store/            # Zustand — minimal client state, server is source of truth
+    └── types/            # mirrors backend Pydantic models exactly
 ```
+
+**What doesn't exist yet** (planned, not built): `sources/` (paper API clients), `extract/` (PDF/HTML → chunks → embeddings), `models/` (domain + API + LLM output schemas), `scripts/` (dev CLI runner).
 
 **Key invariants:**
 - `graphs/` never imports from `sources/` directly — always via `tools/`
-- `lib/llm.py` is the only file that calls LiteLLM — nothing else does
-- `db/` is the only place storage clients are imported
-- Nodes write messages to Postgres directly as they run (not buffered)
+- `llm/runtime.py` is the only file that calls LiteLLM — nothing else does
+- `app/db/` is the only place storage clients are imported
+- Nodes write messages to Postgres directly as they run, not buffered
 
 ### Python
 
-Python packages and dependencies are listed in `./server/pyproject.toml` and not global level `pyproject.toml`.
-
----
+Packages and dependencies are in `./server/pyproject.toml`, not the root.
 
 ## Models
 
-All open-weight. No OpenAI, no Anthropic, no Gemini.
+All open-weight. No OpenAI, no Anthropic, no Gemini. Currently all hosted on Nebius.
 
-| Tier | Primary | Fallback 1 | Fallback 2 |
-|------|---------|-----------|-----------|
-| `main` | DeepSeek-V3 (Together) | Qwen2.5 72B (Nebius) | deepseek-chat (direct) |
-| `fast` | Qwen2.5 72B (Nebius) | Llama 3.3 70B (HF) | deepseek-chat (direct) |
-| `reasoning` | DeepSeek-R1 (Nebius) | DeepSeek-V3 (Together) | deepseek-reasoner (direct) |
-| `cheap` | Mistral Small 3.2 (HF) | Qwen3 30B (Together) | deepseek-chat (direct) |
+| Tier | Models | Use |
+|------|--------|-----|
+| `light` | Nemotron-3 Nano 30B (w=2), Qwen3 30B A3B (w=1) | quick lookups, cheap calls |
+| `medium` | Qwen3 235B A22B Thinking | synthesis, analysis, complex reasoning |
 
-Nodes use `get_model("main")` — never call LiteLLM directly. DeepSeek-R1 (`synthesize` node) has no system prompt support — all instructions go in the user message.
+Nodes call `get_model("light")` or `get_model("medium")` — the router handles weighted selection, retries, and cooldowns. Never call LiteLLM directly.
 
-Embeddings: `BAAI/bge-m3` via Novita ($0.01/1M tokens). All `vector()` columns are 1024-dim.
-
----
-
-## Data model highlights
-
-- **`papers` / `paper_chunks`** — global dedup. `user_papers` junction owns per-user library membership.
-- **`paper_chunks`** — stores `char_start`/`char_end` offsets into R2 files. No raw text in Neon.
-- **`messages`** — canonical message store (not LangGraph checkpoints). Written from inside nodes with idempotent upsert. Links to LangGraph via `checkpoint_id` (no FK — LangGraph blobs are opaque BYTEA).
-- **`runs`** — tracks DEEP run lifecycle and phase.
-- **`semantic_cache`** — DIY pgvector cache (cosine > 0.95). Caches synthesis/planning LLM calls.
-- **`claims` + `claim_relationships`** — V1 contradiction detection via pgvector similarity range (0.6–0.85).
-- **LangMem `AsyncPostgresStore`** — replaces `users.memory TEXT`. Namespaced per user.
-
-R2 layout: `{user_id}/papers/{paper_id}/full.pdf`, `artifacts/{session_id}/{run_id}/report.mdx`, `archives/{session_id}/{run_id}.jsonl`
-
----
-
-## API surface
-
-REST + SSE, all under `/api/v1`. Auth: `Authorization: Bearer <clerk_jwt>`.
-
-Key patterns:
-- **EXPLORE**: `POST /sessions/{id}/chat` -> `text/event-stream`. Events: `token`, `tool_call`, `tool_result`, `message_saved`, `done`, `error`, `budget_exceeded`, `timeout`.
-- **DEEP**: `POST /sessions/{id}/runs` (starts background task, returns `run_id`) -> poll `GET /sessions/{id}/runs/{run_id}` every 5s -> if `status=interrupted`, submit answers via `POST /runs/{id}/resume`.
-- **Branching**: `POST /sessions/{id}/branch` creates a new session with messages reconstructed up to the branch point.
-
-Full spec: `docs/01-planning/v1-sds/11-api-spec.md`
-
----
-
-## Error handling
-
-- Tools return `ToolResult(status='success'|'partial'|'failed'|'budget_exceeded')` — never raise
-- API errors always: `{"error": {"code": "SCREAMING_SNAKE", "message": "...", "request_id": "..."}}`
-- LangGraph node failures: retry 2× on external-API nodes, then `runs.status='failed'` + SSE `error` event
-- No silent swallowing of: node exceptions after retries, Postgres write failures for `messages`/`runs`/`usage_events`, JWT failures
-
----
+Embeddings: `BAAI/bge-m3` via Novita. All `vector()` columns are 1024-dim.
 
 ## Planning docs
 
-All architecture decisions are written before code. Read these before touching the relevant area:
+Read these before touching the relevant area:
 
 | Doc | What it covers |
 |-----|---------------|
 | `docs/01-planning/v1-sds/01-hosting-infra.md` | Render, Neon, R2, Upstash, Cloudflare Pages, Clerk |
 | `docs/01-planning/v1-sds/02-paper-apis.md` | S2, OpenAlex, arXiv — paper fetch waterfall |
 | `docs/01-planning/v1-sds/04-web-search.md` | Exa -> Tavily fallback |
+| `docs/01-planning/v1-sds/05-design-philosophy.md` | Full design principles |
+| `docs/01-planning/v1-sds/06-monorepo-structure.md` | Canonical folder layout and conventions |
 | `docs/01-planning/v1-sds/07-data-model.md` | Full Postgres schema, R2 structure, Redis keys |
 | `docs/01-planning/v1-sds/08-agent-graph.md` | EXPLORE + DEEP graph design, state shapes, SSE contract |
 | `docs/01-planning/v1-sds/09-llm-model-config.md` | Model tiers, `get_model()`, cost estimates |
 | `docs/01-planning/v1-sds/10-memory-caching.md` | Semantic cache, LangMem, contradiction detection |
 | `docs/01-planning/v1-sds/11-api-spec.md` | Every endpoint, request/response shapes, SSE events |
 | `docs/01-planning/v1-sds/12-error-handling.md` | ToolResult, logging, retry policy, SSE error events |
-| `docs/01-planning/v1-sds/13-local-dev.md` | Docker Compose stack, env files, auth bypass, Redis abstraction |
-| `docs/01-planning/v1-sds/14-frontend.md` | React + TS stack, library choices, folder structure, Vite proxy setup |
-
----
+| `docs/01-planning/v1-sds/13-local-dev.md` | Docker Compose stack, env files, auth bypass |
+| `docs/01-planning/v1-sds/14-frontend.md` | React + TS stack, library choices, Vite proxy setup |
 
 ## Constraints
 
@@ -146,6 +122,5 @@ All architecture decisions are written before code. Read these before touching t
 - Budget ~$2–3/month on LLMs after free credits.
 - No abstractions until there's a concrete reason.
 - If a feature doesn't make research easier, defer it.
-- Do not add V2 features (FalkorDB graph, Blaxel batch jobs, knowledge graph visualisation) until V1 is in production.
 - Do not read `.env.dev`, `.env.prod`. Read `.env.local` only if you want to know the keys for the variables.
-- Always surface unknown unknowns and caveats to the user proactively. Let them proactively know of alternatives, consider different use cases, consider proactive looking at documentation to suggest recommendations with foresight
+- Always surface unknown unknowns and caveats proactively. Flag alternatives, edge cases, and documentation gaps before they become problems.
