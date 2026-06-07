@@ -1,5 +1,21 @@
 # delta
 
+- [delta](#delta)
+  - [Getting started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [API Keys](#api-keys)
+  - [Backend](#backend)
+    - [Hosting Infrastructure](#hosting-infrastructure)
+      - [Cloud](#cloud)
+      - [Local](#local)
+    - [Web Search](#web-search)
+    - [Paper Search](#paper-search)
+      - [PMC Resources](#pmc-resources)
+  - [Environment Setup](#environment-setup)
+    - [Backend](#backend-1)
+    - [Frontend](#frontend)
+
+
 Delta is an opinionated academic research agent (and harness) built to assist a researcher.
 
 ## Getting started
@@ -23,9 +39,33 @@ You will need API keys for the following requirements:
 - Semantic Scholar, OpenAlex for paper search
 - Remote hosting resources
 
-Required API keys (and other environment variables) are in [.env.sample](.env.sample)
+Required API keys (and other environment variables) are in [.env.sample](.env.sample).
 
-#### Web Search
+For more information on the exact services required and the auth mechanisms please see below.
+
+## Backend
+
+### Hosting Infrastructure
+
+#### Cloud
+
+Delta is remotely hosted on serverless cloud services. Below is the list of services used. All of them are freemium services. All of them require sign up with a email id and need an API key for authentication. Cloudflare requires a credit card with international transactions enabled to activate R2. 
+
+| Service | Free Tier | Purpose |
+|----------|----------|----------|
+| [Neon](https://console.neon.tech) · [[Docs](https://neon.com/docs/introduction)] | 100 CU-hours/month, 0.5 GB storage, 5 GB egress | PostgreSQL database, pgvector embeddings, LangGraph checkpoints |
+| [Upstash Redis](https://console.upstash.com/redis) · [[Docs](https://upstash.com/docs/redis/introduction)] | 500K commands/month, 256 MB storage | Session locks, caching, paper deduplication, ephemeral state |
+| [Cloudflare R2](https://dash.cloudflare.com/) · [[Docs](https://developers.cloudflare.com/r2/)] | 10 GB storage, 1M Class A ops/month, 10M Class B ops/month, free egress | PDFs, extracted text, uploads, artifacts, session archives |
+| Render | TODO | web server hosting |
+| Cloudflare Pages | TODO | website hosting |
+
+#### Local
+
+Delta can also be remotely hosted using docker containers.
+
+TODO
+
+### Web Search
 
 Web search is a fundamental resource for a research agent. This project relies on API keys from the below listed services. These are freemium services - with a generous free tier and the cheapest paid tier is reasonable.
 
@@ -39,7 +79,7 @@ Web search is a fundamental resource for a research agent. This project relies o
 | [Firecrawl](https://www.firecrawl.dev) | 1000 credits | `FireCrawlLoader` (document loader) |
 
 
-#### Paper Search
+### Paper Search
 
 Delta resolves research papers from the below sources. Semantic Scholar is a notable missing entry as acquiring an API key is difficult for a solo dev unaffiliated with any enterprise org or academic institution. If in the future we acquire a semantic scholar API key, it will become a part of the below table.
 
@@ -53,7 +93,7 @@ Delta resolves research papers from the below sources. Semantic Scholar is a not
 | [OpenAlex](https://docs.openalex.org/api-reference/introduction) | Optional API key (recommended) | [`pyalex`](https://github.com/J535D165/pyalex) | Primary paper search, metadata, references, citations |
 | [PMC](https://pmc.ncbi.nlm.nih.gov/tools/developers/) | Optional NCBI API key | [`pyeuropepmc`](https://github.com/JonasHeinickeBio/pyeuropepmc) | Open-access full text, PDFs, structured XML/JSON, citation data |
 
-##### PMC Resources
+#### PMC Resources
 
 PMC is slightly more complicated than the other sources in the sense that it is 3 API services and not 1. Below there is a link to the services.
 
@@ -63,22 +103,12 @@ PMC is slightly more complicated than the other sources in the sense that it is 
 | [PMC BioC API](https://www.ncbi.nlm.nih.gov/research/bionlp/APIs/BioC-PMC/) | Structured XML/JSON full text | Retrieve machine-readable article content instead of parsing PDFs |
 | [PMC Open Access API](https://pmc.ncbi.nlm.nih.gov/tools/oa-service/) | OA metadata and file locations | Discover licenses, availability, and downloadable article packages |
 
-#### Hosting
+## Environment Setup
 
-
-
-### Environment Setup
-
-#### Backend
+### Backend
 
 Delta's backend is built with python. To set up your development environment, use `uv sync` to create a virtual environment from the `pyproject.toml` files and install all packages.
 
-#### Frontend
-
-TBD
-
-## Advanced setup
-
-### Local hosting
+### Frontend
 
 TODO
