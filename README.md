@@ -21,6 +21,7 @@ You will need API keys for the following requirements:
 - Embedding model inference endpoints (can be the same as the ones for LLM inference, depending on your provider)
 - Exa, Tavily, SerpAPI for web search
 - Semantic Scholar, OpenAlex for paper search
+- Remote hosting resources
 
 Required API keys (and other environment variables) are in [.env.sample](.env.sample)
 
@@ -40,7 +41,31 @@ Web search is a fundamental resource for a research agent. This project relies o
 
 #### Paper Search
 
-TODO
+Delta resolves research papers from the below sources. Semantic Scholar is a notable missing entry as acquiring an API key is difficult for a solo dev unaffiliated with any enterprise org or academic institution. If in the future we acquire a semantic scholar API key, it will become a part of the below table.
+
+| Service | Access / Setup | Python Package | Primary Usage |
+|----------|----------|----------|----------|
+| [CORE](https://api.core.ac.uk/docs/v3) | API Key | None (REST API via `httpx`) | Full-text retrieval, repository PDFs, extracted text |
+| [arXiv](https://info.arxiv.org/help/api/basics.html#python) | No authentication required | [`arxiv`](https://github.com/lukasschwab/arxiv.py) | Full-text HTML, PDFs, preprints, paper search |
+| [Unpaywall](https://unpaywall.org/products/api) | Email parameter only | None (REST API via `httpx`) | DOI → legal open-access copy discovery |
+| [Crossref](https://www.crossref.org/documentation/retrieve-metadata/rest-api/) | No API key (include email/User-Agent) | [`habanero`](https://github.com/sckott/habanero) | DOI normalization, metadata enrichment |
+| [OpenCitations](https://api.opencitations.net/index/v2) | Optional API key | None (REST API via `httpx`) | Citation graph enrichment |
+| [OpenAlex](https://docs.openalex.org/api-reference/introduction) | Optional API key (recommended) | [`pyalex`](https://github.com/J535D165/pyalex) | Primary paper search, metadata, references, citations |
+| [PMC](https://pmc.ncbi.nlm.nih.gov/tools/developers/) | Optional NCBI API key | [`pyeuropepmc`](https://github.com/JonasHeinickeBio/pyeuropepmc) | Open-access full text, PDFs, structured XML/JSON, citation data |
+
+##### PMC Resources
+
+PMC is slightly more complicated than the other sources in the sense that it is 3 API services and not 1. Below there is a link to the services.
+
+| Resource | Documentation | Purpose |
+|----------|----------|----------|
+| [PMC ID Converter API](https://pmc.ncbi.nlm.nih.gov/tools/id-converter-api/) | DOI ↔ PMCID ↔ PMID conversion | Resolve identifiers and determine whether a paper exists in PMC |
+| [PMC BioC API](https://www.ncbi.nlm.nih.gov/research/bionlp/APIs/BioC-PMC/) | Structured XML/JSON full text | Retrieve machine-readable article content instead of parsing PDFs |
+| [PMC Open Access API](https://pmc.ncbi.nlm.nih.gov/tools/oa-service/) | OA metadata and file locations | Discover licenses, availability, and downloadable article packages |
+
+#### Hosting
+
+
 
 ### Environment Setup
 
